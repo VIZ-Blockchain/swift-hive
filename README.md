@@ -1,14 +1,14 @@
 
-swift-steem
+swift-hive
 ===========
 
-Official Steem library for Swift.
+Unofficial Hive library for Swift.
 
 Resources:
 
   * [API documentation](https://steemit.github.io/swift-steem/)
-  * [Issue tracker](https://github.com/steemit/swift-steem/issues)
-  * [Steem developer portal](https://developers.steem.io)
+  * [Issue tracker](https://github.com/hiveuprss/swift-hive/issues)
+  * [Steem developer portal](https://developers.hive.io)
 
 
 Installation
@@ -20,7 +20,7 @@ In your Package.swift add:
 
 ```
 dependencies: [
-    .package(url: "https://github.com/steemit/swift-steem.git", .branch("master"))
+    .package(url: "https://github.com/hiveuprss/swift-hive.git", .branch("master"))
 ]
 ```
 
