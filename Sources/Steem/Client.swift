@@ -109,10 +109,7 @@ extension RequestPayload: Encodable {
 internal struct ResponseError: Decodable {
     let code: Int
     let message: String
-    let data: [String: AnyDecodable]?
-    var resolvedData: [String: Any]? {
-        return self.data?.mapValues { $0.value as Any }
-    }
+    let data: String
 }
 
 /// JSON-RPC 2.0 response payload wrapper.
@@ -121,6 +118,12 @@ internal struct ResponsePayload<T: Request>: Decodable {
     let result: T.Response?
     let error: ResponseError?
 }
+
+internal struct ResponseErrorPayload<T: Request>: Decodable {
+    let id: Int?
+    let error: ResponseError?
+}
+
 
 /// URLSession adapter, for testability.
 internal protocol SessionAdapter {
@@ -163,7 +166,7 @@ public class Client {
         /// Unable to send request or invalid response from server.
         case networkError(message: String, error: Swift.Error?)
         /// Server responded with a JSON-RPC 2.0 error.
-        case responseError(code: Int, message: String, data: [String: Any]?)
+        case responseError(code: Int, message: String, data: String)
         /// Unable to decode the result or encode the request params.
         case codingError(message: String, error: Swift.Error)
 
@@ -223,15 +226,24 @@ public class Client {
             throw Error.networkError(message: "Response body empty", error: nil)
         }
         let decoder = Client.JSONDecoder()
+        
+        let responseErrorPayload: ResponseErrorPayload<T>
+        do {
+            responseErrorPayload = try decoder.decode(ResponseErrorPayload<T>.self, from: data)
+        } catch {
+            throw Error.codingError(message: "Unable to decode error response", error: error)
+        }
+        if let error = responseErrorPayload.error {
+            throw Error.responseError(code: error.code, message: error.message, data: error.data)
+        }
+        
         let responsePayload: ResponsePayload<T>
         do {
             responsePayload = try decoder.decode(ResponsePayload<T>.self, from: data)
         } catch {
             throw Error.codingError(message: "Unable to decode response", error: error)
         }
-        if let error = responsePayload.error {
-            throw Error.responseError(code: error.code, message: error.message, data: error.resolvedData)
-        }
+        
         if responsePayload.id != payload.id {
             throw Error.networkError(message: "Request id mismatch", error: nil)
         }
