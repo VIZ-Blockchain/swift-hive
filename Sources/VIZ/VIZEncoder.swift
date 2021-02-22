@@ -1,47 +1,47 @@
-/// Steem protocol encoding.
+/// VIZ protocol encoding.
 /// - Author: Johan Nordberg <johan@steemit.com>
 
 import Foundation
 import OrderedDictionary
 
-/// A type that can be encoded into Steem binary wire format.
-public protocol SteemEncodable: Encodable {
-    /// Encode self into Steem binary format.
-    func binaryEncode(to encoder: SteemEncoder) throws
+/// A type that can be encoded into VIZ binary wire format.
+public protocol VIZEncodable: Encodable {
+    /// Encode self into VIZ binary format.
+    func binaryEncode(to encoder: VIZEncoder) throws
 }
 
 /// Default implementation which calls through to `Encodable`.
-public extension SteemEncodable {
-    func binaryEncode(to encoder: SteemEncoder) throws {
+public extension VIZEncodable {
+    func binaryEncode(to encoder: VIZEncoder) throws {
         try self.encode(to: encoder)
     }
 }
 
-/// Encodes data into Steem binary format.
-public class SteemEncoder {
-    /// All errors which `SteemEncoder` can throw.
+/// Encodes data into VIZ binary format.
+public class VIZEncoder {
+    /// All errors which `VIZEncoder` can throw.
     public enum Error: Swift.Error {
-        /// Thrown if encoder encounters a type that is not conforming to `SteemEncodable`.
-        case typeNotConformingToSteemEncodable(Encodable.Type)
+        /// Thrown if encoder encounters a type that is not conforming to `VIZEncodable`.
+        case typeNotConformingToVIZEncodable(Encodable.Type)
         /// Thrown if encoder encounters a type that is not confirming to `Encodable`.
         case typeNotConformingToEncodable(Any.Type)
     }
 
     /// Data buffer holding the encoded bytes.
-    /// - Note: Implementers of `SteemEncodable` can write directly into this.
+    /// - Note: Implementers of `VIZEncodable` can write directly into this.
     public var data = Data()
 
     /// Create a new encoder.
     public init() {}
 
     /// Convenience for creating an encoder, encoding a value and returning the data.
-    public static func encode(_ value: SteemEncodable) throws -> Data {
-        let encoder = SteemEncoder()
+    public static func encode(_ value: VIZEncodable) throws -> Data {
+        let encoder = VIZEncoder()
         try value.binaryEncode(to: encoder)
         return encoder.data
     }
 
-    /// Encodes any `SteemEncodable`.
+    /// Encodes any `VIZEncodable`.
     /// - Note: Platform specific integer types `Int` and `UInt` are encoded as varints.
     public func encode(_ value: Encodable) throws {
         switch value {
@@ -49,16 +49,16 @@ public class SteemEncoder {
             self.appendVarint(UInt64(v))
         case let v as UInt:
             self.appendVarint(UInt64(v))
-        case let v as Array<SteemEncodable>:
+        case let v as Array<VIZEncodable>:
             self.appendVarint(UInt64(v.count))
             for i in v {
                 try i.binaryEncode(to: self)
             }
             break
-        case let v as SteemEncodable:
+        case let v as VIZEncodable:
             try v.binaryEncode(to: self)
         default:
-            throw Error.typeNotConformingToSteemEncodable(type(of: value))
+            throw Error.typeNotConformingToVIZEncodable(type(of: value))
         }
     }
 
@@ -84,7 +84,7 @@ public class SteemEncoder {
 // Encoder conformance.
 // Based on Mike Ash's BinaryEncoder
 // https://github.com/mikeash/BinaryCoder
-extension SteemEncoder: Encoder {
+extension VIZEncoder: Encoder {
     public var codingPath: [CodingKey] { return [] }
 
     public var userInfo: [CodingUserInfoKey: Any] { return [:] }
@@ -102,7 +102,7 @@ extension SteemEncoder: Encoder {
     }
 
     private struct KeyedContainer<Key: CodingKey>: KeyedEncodingContainerProtocol {
-        var encoder: SteemEncoder
+        var encoder: VIZEncoder
 
         var codingPath: [CodingKey] { return [] }
 
@@ -130,7 +130,7 @@ extension SteemEncoder: Encoder {
     }
 
     private struct UnkeyedContanier: UnkeyedEncodingContainer, SingleValueEncodingContainer {
-        var encoder: SteemEncoder
+        var encoder: VIZEncoder
 
         var codingPath: [CodingKey] { return [] }
 
@@ -158,30 +158,30 @@ extension SteemEncoder: Encoder {
 
 // MARK: - Default type extensions
 
-extension FixedWidthInteger where Self: SteemEncodable {
-    public func binaryEncode(to encoder: SteemEncoder) {
+extension FixedWidthInteger where Self: VIZEncodable {
+    public func binaryEncode(to encoder: VIZEncoder) {
         encoder.appendBytes(of: self.littleEndian)
     }
 }
 
-extension Int8: SteemEncodable {}
-extension UInt8: SteemEncodable {}
-extension Int16: SteemEncodable {}
-extension UInt16: SteemEncodable {}
-extension Int32: SteemEncodable {}
-extension UInt32: SteemEncodable {}
-extension Int64: SteemEncodable {}
-extension UInt64: SteemEncodable {}
+extension Int8: VIZEncodable {}
+extension UInt8: VIZEncodable {}
+extension Int16: VIZEncodable {}
+extension UInt16: VIZEncodable {}
+extension Int32: VIZEncodable {}
+extension UInt32: VIZEncodable {}
+extension Int64: VIZEncodable {}
+extension UInt64: VIZEncodable {}
 
-extension String: SteemEncodable {
-    public func binaryEncode(to encoder: SteemEncoder) {
+extension String: VIZEncodable {
+    public func binaryEncode(to encoder: VIZEncoder) {
         encoder.appendVarint(UInt64(self.utf8.count))
         encoder.data.append(contentsOf: self.utf8)
     }
 }
 
-extension Array: SteemEncodable where Element: Encodable {
-    public func binaryEncode(to encoder: SteemEncoder) throws {
+extension Array: VIZEncodable where Element: Encodable {
+    public func binaryEncode(to encoder: VIZEncoder) throws {
         encoder.appendVarint(UInt64(self.count))
         for item in self {
             try encoder.encode(item)
@@ -189,8 +189,8 @@ extension Array: SteemEncodable where Element: Encodable {
     }
 }
 
-extension OrderedDictionary: SteemEncodable where Key: SteemEncodable, Value: SteemEncodable {
-    public func binaryEncode(to encoder: SteemEncoder) throws {
+extension OrderedDictionary: VIZEncodable where Key: VIZEncodable, Value: VIZEncodable {
+    public func binaryEncode(to encoder: VIZEncoder) throws {
         encoder.appendVarint(UInt64(self.count))
         for (key, value) in self {
             try encoder.encode(key)
@@ -199,26 +199,26 @@ extension OrderedDictionary: SteemEncodable where Key: SteemEncodable, Value: St
     }
 }
 
-extension Date: SteemEncodable {
-    public func binaryEncode(to encoder: SteemEncoder) throws {
+extension Date: VIZEncodable {
+    public func binaryEncode(to encoder: VIZEncoder) throws {
         try encoder.encode(UInt32(self.timeIntervalSince1970))
     }
 }
 
-extension Data: SteemEncodable {
-    public func binaryEncode(to encoder: SteemEncoder) {
+extension Data: VIZEncodable {
+    public func binaryEncode(to encoder: VIZEncoder) {
         encoder.data.append(self)
     }
 }
 
-extension Bool: SteemEncodable {
-    public func binaryEncode(to encoder: SteemEncoder) {
+extension Bool: VIZEncodable {
+    public func binaryEncode(to encoder: VIZEncoder) {
         encoder.data.append(self ? 1 : 0)
     }
 }
 
-extension Optional: SteemEncodable where Wrapped: SteemEncodable {
-    public func binaryEncode(to encoder: SteemEncoder) throws {
+extension Optional: VIZEncodable where Wrapped: VIZEncodable {
+    public func binaryEncode(to encoder: VIZEncoder) throws {
         if let value = self {
             encoder.data.append(1)
             try encoder.encode(value)

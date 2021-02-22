@@ -1,5 +1,5 @@
 import Foundation
-import Steem
+import VIZ
 import XCTest
 
 class PerformanceTest: XCTestCase {
@@ -19,7 +19,7 @@ class PerformanceTest: XCTestCase {
         let txn = Transaction(refBlockNum: 0, refBlockPrefix: 0, expiration: Date(), operations: [vote, comment])
         self.measure {
             for _ in 0 ... 1000 {
-                _ = try! SteemEncoder.encode(txn)
+                _ = try! VIZEncoder.encode(txn)
             }
         }
     }

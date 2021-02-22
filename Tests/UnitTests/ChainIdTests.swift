@@ -1,13 +1,6 @@
-//
-//  ChainIdTests.swift
-//  SteemTests
-//
-//  Created by im on 10/12/18.
-//
-
 import Foundation
 import XCTest
-@testable import Steem
+@testable import VIZ
 
 class ChainIdTest: XCTestCase {
     func testEncodeCustomChainId() {
@@ -20,6 +13,6 @@ class ChainIdTest: XCTestCase {
     }
     func testMainnetId() {
         let mockChainId = ChainId.mainNet.data
-        XCTAssertEqual(mockChainId, Data(hexEncoded: "0000000000000000000000000000000000000000000000000000000000000000"))
+        XCTAssertEqual(mockChainId, Data(hexEncoded: "2040effda178d4fffff5eab7a915d4019879f5205cc5392e4bcced2b6edda0cd"))
     }
 }

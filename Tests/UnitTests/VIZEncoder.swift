@@ -1,8 +1,8 @@
 import OrderedDictionary
-@testable import Steem
+@testable import VIZ
 import XCTest
 
-class SteemEncoderTest: XCTestCase {
+class VIZEncoderTest: XCTestCase {
     func testFixedWidthInteger() {
         AssertEncodes(0 as Int8, Data("00"))
         AssertEncodes(-128 as Int8, Data("80"))

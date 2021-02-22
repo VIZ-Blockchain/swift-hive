@@ -1,4 +1,4 @@
-@testable import Steem
+@testable import VIZ
 import XCTest
 
 let secretKey = Data(base64Encoded: "LPJNul+wow4m6DsqxbninhsWHlwfp0JecwQzYpOLmCQ=")!

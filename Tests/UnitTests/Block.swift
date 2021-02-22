@@ -1,5 +1,5 @@
 import Foundation
-@testable import Steem
+@testable import VIZ
 import XCTest
 
 class BlockTest: XCTestCase {
@@ -10,7 +10,7 @@ class BlockTest: XCTestCase {
         XCTAssertEqual(block.witnessSignature, Signature("1f26706cb7da8528a303f55c7e260b8b43ba2aaddb2970d01563f5b1d1dc1d8e0342e4afe22e95277d37b4e7a429df499771f8db064e64aa964a0ba4a17a18fb2b"))
         XCTAssertEqual(block.timestamp, Date(timeIntervalSince1970: 1_464_911_925))
         XCTAssertEqual(block.transactions.count, 3)
-        let op = block.transactions.first?.operations.first as? Steem.Operation.Vote
+        let op = block.transactions.first?.operations.first as? VIZ.Operation.Vote
         XCTAssertEqual(op?.voter, "proctologic")
         AssertEncodes(block, [
             "previous": "001e847f77b2d0bc1c29caf02b1a98d79aefb7ad",

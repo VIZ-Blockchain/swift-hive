@@ -1,17 +1,14 @@
-/// Steem PublicKey implementation.
+/// VIZ PublicKey implementation.
 /// - Author: Johan Nordberg <johan@steemit.com>
 
 import Foundation
 
-/// A Steem public key.
+/// A VIZ public key.
 public struct PublicKey: Equatable {
     /// Chain address prefix.
     public enum AddressPrefix: Equatable, Hashable {
-        /// STM, main network.
-        case mainNet
-        /// TST, test networks.
-        case testNet
-        /// Freeform address prefix, e.g. "STX".
+        case mainNet // VIZ
+        case testNet // VIZ
         case custom(String)
     }
 
@@ -32,8 +29,8 @@ public struct PublicKey: Equatable {
         self.prefix = prefix
     }
 
-    /// Create a new PublicKey instance from a Steem public key address.
-    /// - Parameter address: The public key in Steem address format.
+    /// Create a new PublicKey instance from a VIZ public key address.
+    /// - Parameter address: The public key in VIZ address format.
     public init?(_ address: String) {
         let prefix = address.prefix(3)
         guard prefix.count == 3 else {
@@ -66,7 +63,7 @@ extension PublicKey: LosslessStringConvertible {
     public var description: String { return self.address }
 }
 
-extension PublicKey: SteemEncodable, Decodable {
+extension PublicKey: VIZEncodable, Decodable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         guard let key = PublicKey(try container.decode(String.self)) else {
@@ -80,7 +77,7 @@ extension PublicKey: SteemEncodable, Decodable {
         try container.encode(String(self))
     }
 
-    public func binaryEncode(to encoder: SteemEncoder) {
+    public func binaryEncode(to encoder: VIZEncoder) {
         encoder.data.append(self.key)
     }
 }
@@ -90,9 +87,9 @@ extension PublicKey.AddressPrefix: ExpressibleByStringLiteral, LosslessStringCon
 
     /// Create new addres prefix from string.
     public init(_ value: String) {
-        if value == "STM" {
+        if value == "VIZ" {
             self = .mainNet
-        } else if value == "TST" {
+        } else if value == "VIZTEST" {
             self = .testNet
         } else {
             self = .custom(value)
@@ -103,13 +100,13 @@ extension PublicKey.AddressPrefix: ExpressibleByStringLiteral, LosslessStringCon
         self.init(value)
     }
 
-    /// String representation of address prefix, e.g. "STM".
+    /// String representation of address prefix, e.g. "VIZ".
     public var description: String {
         switch self {
         case .mainNet:
-            return "STM"
+            return "VIZ"
         case .testNet:
-            return "TST"
+            return "VIZ"
         case let .custom(prefix):
             return prefix.uppercased()
         }

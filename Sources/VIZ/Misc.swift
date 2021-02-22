@@ -1,13 +1,13 @@
-/// Misc Steem protocol types.
+/// Misc VIZ protocol types.
 /// - Author: Johan Nordberg <johan@steemit.com>
 
 import Foundation
 
-/// A type that is decodable to Steem binary format as well as JSON encodable and decodable.
-public typealias SteemCodable = SteemEncodable & Decodable
+/// A type that is decodable to VIZ binary format as well as JSON encodable and decodable.
+public typealias VIZCodable = VIZEncodable & Decodable
 
 /// Placeholder type for future extensions.
-public struct FutureExtensions: SteemCodable, Equatable {}
+public struct FutureExtensions: VIZCodable, Equatable {}
 
 /// Type representing an optional JSON string.
 public struct JSONString: Equatable {
@@ -29,7 +29,7 @@ public struct JSONString: Equatable {
     }
 }
 
-extension JSONString: SteemCodable {
+extension JSONString: VIZCodable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         self.value = try container.decode(String.self)

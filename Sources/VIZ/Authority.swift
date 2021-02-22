@@ -1,15 +1,15 @@
-/// Steem authority types.
+/// VIZ authority types.
 /// - Author: Johan Nordberg <johan@steemit.com>
 
 import Foundation
 
-/// Type representing a Steem authority.
+/// Type representing a VIZ authority.
 ///
 /// Authorities are a collection of accounts and keys that need to sign
 /// a message for it to be considered valid.
-public struct Authority: SteemCodable, Equatable {
+public struct Authority: VIZCodable, Equatable {
     /// A type representing a key or account auth and its weight.
-    public struct Auth<T: SteemCodable & Equatable>: Equatable {
+    public struct Auth<T: VIZCodable & Equatable>: Equatable {
         public let value: T
         public let weight: UInt16
     }
@@ -29,7 +29,7 @@ extension Authority.Auth {
     }
 }
 
-extension Authority.Auth: SteemCodable {
+extension Authority.Auth: VIZCodable {
     public init(from decoder: Decoder) throws {
         var container = try decoder.unkeyedContainer()
         self.value = try container.decode(T.self)

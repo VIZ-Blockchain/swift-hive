@@ -66,7 +66,7 @@
 #define USE_ETHEREUM 0
 #endif
 
-// support Graphene operations (STEEM, BitShares)
+// support Graphene operations (VIZ, BitShares)
 #ifndef USE_GRAPHENE
 #define USE_GRAPHENE 1
 #endif

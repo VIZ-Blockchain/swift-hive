@@ -1,9 +1,9 @@
-/// Steem block types.
+/// VIZ block types.
 /// - Author: Johan Nordberg <johan@steemit.com>
 
 import Foundation
 
-/// Type representing a Steem block ID.
+/// Type representing a VIZ block ID.
 public struct BlockId: Codable, Equatable {
     /// The block hash.
     public var hash: Data
@@ -52,7 +52,7 @@ fileprivate protocol _BlockHeader: Codable {
     var extensions: [BlockExtension] { get }
 }
 
-/// A type representing a Steem block header.
+/// A type representing a VIZ block header.
 public struct BlockHeader: _BlockHeader {
     public let previous: BlockId
     public let timestamp: Date
@@ -61,7 +61,7 @@ public struct BlockHeader: _BlockHeader {
     public let extensions: [BlockExtension]
 }
 
-/// A type representing a signed Steem block header.
+/// A type representing a signed VIZ block header.
 public struct SignedBlockHeader: _BlockHeader, Equatable {
     public let previous: BlockId
     public let timestamp: Date
@@ -71,7 +71,7 @@ public struct SignedBlockHeader: _BlockHeader, Equatable {
     public let witnessSignature: Signature
 }
 
-/// A type representing a Steem block.
+/// A type representing a VIZ block.
 public struct SignedBlock: _BlockHeader, Equatable {
     /// The transactions included in this block.
     public let transactions: [Transaction]

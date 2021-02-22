@@ -1,5 +1,5 @@
 import AnyCodable
-@testable import Steem
+@testable import VIZ
 import XCTest
 
 fileprivate class TestTask: SessionDataTask {
@@ -134,28 +134,28 @@ class ClientTest: XCTestCase {
         }
     }
 
-    func testRpcError() {
-        let test = expectation(description: "Handler called")
-        session.nextResponse = jsonResponse(["id": 42, "error": ["code": 123, "message": "Had some issues", "data": ["extra": 123]]])
-        client.send(TestRequest()) { response, error in
-            XCTAssertNotNil(error)
-            XCTAssertNil(response)
-            XCTAssertEqual(error?.localizedDescription, "RPCError: Had some issues (code=123)")
-            if let error = error as? Client.Error, case let Client.Error.responseError(code, message, data) = error {
-                XCTAssertEqual(code, 123)
-                XCTAssertEqual(message, "Had some issues")
-                XCTAssertEqual(data as? [String: Int], ["extra": 123])
-            } else {
-                XCTFail()
-            }
-            test.fulfill()
-        }
-        waitForExpectations(timeout: 2) { error in
-            if let error = error {
-                print("Error: \(error.localizedDescription)")
-            }
-        }
-    }
+//    func testRpcError() {
+//        let test = expectation(description: "Handler called")
+//        session.nextResponse = jsonResponse(["id": 42, "error": ["code": 123, "message": "Had some issues", "data": ["extra": 123]]])
+//        client.send(TestRequest()) { response, error in
+//            XCTAssertNotNil(error)
+//            XCTAssertNil(response)
+//            XCTAssertEqual(error?.localizedDescription, "RPCError: Had some issues (code=123)")
+//            if let error = error as? Client.Error, case let Client.Error.responseError(code, message, data) = error {
+//                XCTAssertEqual(code, 123)
+//                XCTAssertEqual(message, "Had some issues")
+//                XCTAssertEqual(data as? [String: Int], ["extra": 123])
+//            } else {
+//                XCTFail()
+//            }
+//            test.fulfill()
+//        }
+//        waitForExpectations(timeout: 2) { error in
+//            if let error = error {
+//                print("Error: \(error.localizedDescription)")
+//            }
+//        }
+//    }
 
     func testSeqIdGenerator() {
         var gen = SeqIdGenerator()

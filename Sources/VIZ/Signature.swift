@@ -1,9 +1,9 @@
-/// Steem Signature implementation.
+/// VIZ Signature implementation.
 /// - Author: Johan Nordberg <johan@steemit.com>
 
 import Foundation
 
-/// A Steem signature.
+/// A VIZ signature.
 public struct Signature: Equatable, LosslessStringConvertible {
     private let signature: Data
     private let recoveryId: UInt8

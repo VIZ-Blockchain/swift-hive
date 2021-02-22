@@ -1,5 +1,5 @@
 import Foundation
-@testable import Steem
+@testable import VIZ
 import XCTest
 
 extension Data: LosslessStringConvertible {
@@ -42,9 +42,9 @@ func TestEncode<T: Encodable>(_ value: T) throws -> Any {
     return try JSONSerialization.jsonObject(with: data, options: [])
 }
 
-func AssertEncodes<T: SteemEncodable>(_ value: T, _ expected: Data, file: StaticString = #file, line: UInt = #line) {
+func AssertEncodes<T: VIZEncodable>(_ value: T, _ expected: Data, file: StaticString = #file, line: UInt = #line) {
     do {
-        let encoded = try SteemEncoder.encode(value)
+        let encoded = try VIZEncoder.encode(value)
         XCTAssertEqual(encoded.hexEncodedString(), expected.hexEncodedString(), file: file, line: line)
     } catch {
         XCTFail("Encoding error: \(error)", file: file, line: line)

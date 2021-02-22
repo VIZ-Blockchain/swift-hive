@@ -26,7 +26,7 @@ extension ClientTest {
         ("testBadServerResponse", testBadServerResponse),
         ("testRequest", testRequest),
         ("testRequestWithParams", testRequestWithParams),
-        ("testRpcError", testRpcError),
+//        ("testRpcError", testRpcError),
         ("testSeqIdGenerator", testSeqIdGenerator),
     ]
 }
@@ -56,7 +56,7 @@ extension PublicKeyTest {
         ("testInvalidKeys", testInvalidKeys),
         ("testKey", testKey),
         ("testNullKey", testNullKey),
-        ("testTestnetKey", testTestnetKey),
+//        ("testTestnetKey", testTestnetKey),
     ]
 }
 
@@ -68,7 +68,7 @@ extension Secp256k1Test {
     ]
 }
 
-extension SeemURLTest {
+extension VIZURLTest {
     static let __allTests = [
         ("testEncodeDecode", testEncodeDecode),
         ("testParams", testParams),
@@ -89,7 +89,7 @@ extension SignatureTest {
     ]
 }
 
-extension SteemEncoderTest {
+extension VIZEncoderTest {
     static let __allTests = [
         ("testArray", testArray),
         ("testFixedWidthInteger", testFixedWidthInteger),
@@ -119,7 +119,7 @@ extension TransactionTest {
             testCase(SeemURLTest.__allTests),
             testCase(Sha2Test.__allTests),
             testCase(SignatureTest.__allTests),
-            testCase(SteemEncoderTest.__allTests),
+            testCase(VIZEncoderTest.__allTests),
             testCase(TransactionTest.__allTests),
         ]
     }

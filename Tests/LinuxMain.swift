@@ -1,9 +1,9 @@
-import SteemIntegrationTests
-import SteemTests
 import XCTest
 
-var tests = [XCTestCaseEntry]()
-tests += SteemTests.__allTests()
-tests += SteemIntegrationTests.__allTests()
+import UnitTests
+import IntegrationTests
 
+var tests = [XCTestCaseEntry]()
+tests += UnitTests.allTests()
+tests += IntegrationTests.allTests()
 XCTMain(tests)

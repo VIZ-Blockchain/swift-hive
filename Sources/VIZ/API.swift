@@ -1,26 +1,23 @@
-/// Steem RPC requests and responses.
+/// VIZ RPC requests and responses.
 /// - Author: Johan Nordberg <johan@steemit.com>
 /// - Author: Iain Maitland <imaitland@steemit.com>
 
 import AnyCodable
 import Foundation
 
-/// Steem RPC API request- and response-types.
+/// VIZ RPC API request- and response-types.
 public struct API {
-    /// Wrapper for pre-appbase steemd calls.
+    /// Wrapper for pre-appbase vizd calls.
     public struct CallParams<T: Encodable>: Encodable {
-        let api: String
         let method: String
         let params: [T]
-        init(_ api: String, _ method: String, _ params: [T]) {
-            self.api = api
+        init(_ method: String, _ params: [T]) {
             self.method = method
             self.params = params
         }
 
         public func encode(to encoder: Encoder) throws {
             var container = encoder.unkeyedContainer()
-            try container.encode(api)
             try container.encode(method)
             try container.encode(params)
         }
@@ -29,71 +26,35 @@ public struct API {
     public struct DynamicGlobalProperties: Decodable {
         public let headBlockNumber: UInt32
         public let headBlockId: BlockId
+        public let time: Date
+        public let genesisTime: Date
         public let currentWitness: String
-        public let numPowWitnesses: UInt32
-        public let virtualSupply: Asset
+        public let committeeFund: Asset
+        public let committeeRequests: UInt32
         public let currentSupply: Asset
-        public let confidentialSupply: Asset
-        public let currentSbdSupply: Asset
-        public let confidentialSbdSupply: Asset
-        public let totalVestingFundSteem: Asset
+        public let totalVestingFund: Asset
         public let totalVestingShares: Asset
-        public let totalRewardFundSteem: Asset
-        public let totalRewardShares2: String
-        public let pendingRewardedVestingShares: Asset
-        public let pendingRewardedVestingSteem: Asset
-        public let sbdInterestRate: UInt32
-        public let sbdPrintRate: UInt32
+        public let totalRewardFund: Asset
+        public let totalRewardShares: String
+        public let inflationCalcBlockNum: UInt32
+        public let inflationWitnessPercent: Int16
+        public let inflationRatio: Int16
+        public let averageBlockSize: UInt32
+        public let maximumBlockSize: UInt32
         public let currentAslot: UInt32
         public let recentSlotsFilled: String
         public let participationCount: UInt32
         public let lastIrreversibleBlockNum: UInt32
-        public let votePowerReserveRate: UInt32
-        public let time: Date
+        public let maxVirtualBandwidth: String
+        public let currentReserveRatio: UInt64
+        public let voteRegenerationPerDay: UInt32
     }
 
     public struct GetDynamicGlobalProperties: Request {
         public typealias Response = DynamicGlobalProperties
-        public let method = "condenser_api.get_dynamic_global_properties"
+        public let method = "get_dynamic_global_properties"
         public let params: RequestParams<[String]>? = RequestParams([])
         public init() {}
-    }
-
-    public struct SteemPrices: Decodable {
-        public let steemSbd: Float32
-        public let steemUsd: Float32
-        public let steemVest: Float32
-    }
-
-    public struct GetPrices: Request {
-        public typealias Response = SteemPrices
-        public let method = "conveyor.get_prices"
-        public init() {}
-    }
-
-    public struct FeedHistory: Decodable {
-        public let currentMedianHistory: Price
-        public let priceHistory: [Price]
-    }
-
-    public struct GetFeedHistory: Request {
-        public typealias Response = FeedHistory
-        public let method = "get_feed_history"
-        public init() {}
-    }
-
-    public struct OrderBook: Decodable {
-        public let bids: [Order]
-        public let asks: [Order]
-    }
-
-    public struct GetOrderBook: Request {
-        public typealias Response = OrderBook
-        public let method = "get_order_book"
-        public let params: RequestParams<Int>?
-        public init(count: Int) {
-            self.params = RequestParams([count])
-        }
     }
 
     public struct TransactionConfirmation: Decodable {
@@ -108,7 +69,7 @@ public struct API {
         public let method = "call"
         public let params: CallParams<SignedTransaction>?
         public init(transaction: SignedTransaction) {
-            self.params = CallParams("condenser_api", "broadcast_transaction_synchronous", [transaction])
+            self.params = CallParams("broadcast_transaction_synchronous", [transaction])
         }
     }
 
@@ -137,42 +98,26 @@ public struct API {
     public struct ExtendedAccount: Decodable {
         public let id: Int
         public let name: String
-        public let owner: Authority
-        public let active: Authority
-        public let posting: Authority
+        public let masterAuthority: Authority
+        public let activeAuthority: Authority
+        public let regularAuthority: Authority
         public let memoKey: PublicKey
         public let jsonMetadata: String
         public let proxy: String
-        public let lastOwnerUpdate: Date
+        public let referrer: String
+        public let lastMasterUpdate: Date
         public let lastAccountUpdate: Date
         public let created: Date
-        public let mined: Bool
         public let recoveryAccount: String
-        public let resetAccount: String
         public let lastAccountRecovery: Date
-        public let commentCount: UInt32
-        public let lifetimeVoteCount: UInt32
-        public let postCount: UInt32
-        public let canVote: Bool
-        public let votingPower: UInt16
+        public let awardedRshares: UInt64
+        public let customSequence: UInt64
+        public let customSequenceBlockNum: UInt64
+        public let energy: Int32
         public let lastVoteTime: Date
         public let balance: Asset
-        public let savingsBalance: Asset
-        public let sbdBalance: Asset
-        public let sbdSeconds: String // uint128_t
-        public let sbdSecondsLastUpdate: Date
-        public let sbdLastInterestPayment: Date
-        public let savingsSbdBalance: Asset
-        public let savingsSbdSeconds: String // uint128_t
-        public let savingsSbdSecondsLastUpdate: Date
-        public let savingsSbdLastInterestPayment: Date
-        public let savingsWithdrawRequests: UInt8
-        public let rewardSbdBalance: Asset
-        public let rewardSteemBalance: Asset
-        public let rewardVestingBalance: Asset
-        public let rewardVestingSteem: Asset
-        public let curationRewards: Share
-        public let postingRewards: Share
+        public let receiverAwards: UInt64
+        public let benefactorAwards: UInt64
         public let vestingShares: Asset
         public let delegatedVestingShares: Asset
         public let receivedVestingShares: Asset
@@ -183,14 +128,26 @@ public struct API {
         public let withdrawRoutes: UInt16
         public let proxiedVsfVotes: [Share]
         public let witnessesVotedFor: UInt16
+        public let witnessesVoteWeight: Share
         public let lastPost: Date
         public let lastRootPost: Date
+        public let averageBandwidth: Share
+        public let lifetimeBandwidth: Share
+        public let lastBandwidthUpdate: Date
+        public let witnessVotes: [String]
+        public let valid: Bool
+        public let accountSeller: String
+        public let accountOfferPrice: Asset
+        public let accountOnSale: Bool
+        public let subaccountSeller: String
+        public let subaccountOfferPrice: Asset
+        public let subaccountOnSale: Bool
     }
 
     /// Fetch accounts.
     public struct GetAccounts: Request {
         public typealias Response = [ExtendedAccount]
-        public let method = "condenser_api.get_accounts"
+        public let method = "get_accounts"
         public let params: RequestParams<[String]>?
         public init(names: [String]) {
             self.params = RequestParams([names])
@@ -222,7 +179,7 @@ public struct API {
 
     public struct GetAccountHistory: Request, Encodable {
         public typealias Response = [AccountHistoryObject]
-        public let method = "condenser_api.get_account_history"
+        public let method = "get_account_history"
         public var params: RequestParams<AnyEncodable>? {
             return RequestParams([AnyEncodable(self.account), AnyEncodable(self.from), AnyEncodable(self.limit)])
         }
@@ -235,23 +192,5 @@ public struct API {
             self.from = from
             self.limit = limit
         }
-    }
-
-    /// Type representing the order book for the internal STEEM market
-    public struct Order: Equatable, SteemEncodable, Decodable {
-        /// The order price
-        public var orderPrice: Price
-
-        /// The real price
-        public var realPrice: String
-
-        /// The STEEM price
-        public var steem: UInt32
-
-        /// The SBD price
-        public var sbd: UInt32
-
-        /// Created
-        public var created: Date
     }
 }

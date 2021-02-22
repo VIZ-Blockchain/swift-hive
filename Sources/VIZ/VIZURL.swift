@@ -1,13 +1,11 @@
-/// Steem signing URLs.
+/// VIZ signing URLs.
 /// - Author: Johan Nordberg <johan@steemit.com>
 
 import Foundation
 
-/// Type representing a Steem signing URL
-///
-/// See specification at https://github.com/steemit/steem-uri-spec
-public struct SteemURL {
-    /// All errors `SteemURL` can throw.
+/// Type representing a VIZ signing URL
+public struct VIZURL {
+    /// All errors `VIZURL` can throw.
     public enum Error: Swift.Error {
         case invalidURL
         case invalidScheme
@@ -39,9 +37,9 @@ public struct SteemURL {
         case operations = "ops"
     }
 
-    /// Parses a steem signing url
-    static func parse(_ url: URLComponents) throws -> SteemURL {
-        guard url.scheme == "steem" else {
+    /// Parses a VIZ signing url
+    static func parse(_ url: URLComponents) throws -> VIZURL {
+        guard url.scheme == "viz" else {
             throw Error.invalidScheme
         }
         guard let action = url.host, action == "sign" else {
@@ -84,7 +82,7 @@ public struct SteemURL {
                 }
             }
         }
-        return SteemURL(type: type, params: params, payload: payload)
+        return VIZURL(type: type, params: params, payload: payload)
     }
 
     /// The signing params.
@@ -93,7 +91,7 @@ public struct SteemURL {
     let type: PayloadType
     let payload: Any
 
-    /// Create a new SteemURL from a custom payload.
+    /// Create a new VIZURL from a custom payload.
     /// - Note: An invalid payload will cause the `resolve()` method to throw.
     public init(type: PayloadType, params: Params, payload: Any) {
         self.type = type
@@ -101,35 +99,35 @@ public struct SteemURL {
         self.payload = payload
     }
 
-    /// Create a new SteemURL from a string
+    /// Create a new VIZURL from a string
     public init?(string: String) {
         guard let url = URLComponents(string: string),
-            let _self = try? SteemURL.parse(url)
+            let _self = try? VIZURL.parse(url)
         else {
             return nil
         }
         self = _self
     }
 
-    /// Create a new SteemURL from a URL.
+    /// Create a new VIZURL from a URL.
     public init?(url: URL) {
         guard let url = URLComponents(url: url, resolvingAgainstBaseURL: true),
-            let _self = try? SteemURL.parse(url)
+            let _self = try? VIZURL.parse(url)
         else {
             return nil
         }
         self = _self
     }
 
-    /// Create a new SteemURL from a set of url components.
+    /// Create a new VIZURL from a set of url components.
     public init?(urlComponents url: URLComponents) {
-        guard let _self = try? SteemURL.parse(url) else {
+        guard let _self = try? VIZURL.parse(url) else {
             return nil
         }
         self = _self
     }
 
-    /// Create a new SteemURL with a transaction, `steem://sign/tx/...`
+    /// Create a new VIZURL with a transaction, `viz://sign/tx/...`
     public init?(transaction: Transaction, params: Params = Params()) {
         guard let payload = try? encodeObject(transaction) else {
             return nil
@@ -139,7 +137,7 @@ public struct SteemURL {
         self.params = params
     }
 
-    /// Create a new SteemURL with an operation, `steem://sign/op/...`
+    /// Create a new VIZURL with an operation, `viz://sign/op/...`
     public init?(operation: OperationType, params: Params = Params()) {
         guard let payload = try? encodeObject(AnyOperation(operation)) else {
             return nil
@@ -149,7 +147,7 @@ public struct SteemURL {
         self.params = params
     }
 
-    /// Create a new SteemURL with several operations, `steem://sign/ops/...`
+    /// Create a new VIZURL with several operations, `viz://sign/ops/...`
     public init?(operations: [OperationType], params: Params = Params()) {
         guard let payload = try? encodeObject(operations.map({ AnyOperation($0) })) else {
             return nil
@@ -273,13 +271,13 @@ public struct SteemURL {
         return URL(string: urlString)
     }
 
-    /// The steem:// URL
+    /// The viz:// URL
     var url: URL? {
         guard let data = try? JSONSerialization.data(withJSONObject: self.payload, options: []) else {
             return nil
         }
         var url = URLComponents()
-        url.scheme = "steem"
+        url.scheme = "viz"
         url.host = "sign"
         url.path = "/\(self.type.rawValue)/\(data.base64uEncodedString())"
         var query: [URLQueryItem] = []
@@ -302,17 +300,17 @@ public struct SteemURL {
     }
 }
 
-extension SteemURL: CustomStringConvertible {
+extension VIZURL: CustomStringConvertible {
     public var description: String {
         guard let url = self.url else {
-            return "Invalid SteemURL"
+            return "Invalid VIZURL"
         }
         return url.absoluteString
     }
 }
 
-extension SteemURL: Equatable {
-    public static func == (lhs: SteemURL, rhs: SteemURL) -> Bool {
+extension VIZURL: Equatable {
+    public static func == (lhs: VIZURL, rhs: VIZURL) -> Bool {
         return lhs.url == rhs.url
     }
 }

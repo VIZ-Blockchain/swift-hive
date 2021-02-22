@@ -1,9 +1,9 @@
-/// Steem PrivateKey implementation.
+/// VIZ PrivateKey implementation.
 /// - Author: Johan Nordberg <johan@steemit.com>
 
 import Foundation
 
-/// A Steem private key.
+/// A VIZ private key.
 public struct PrivateKey: Equatable {
     private let secret: Data
 

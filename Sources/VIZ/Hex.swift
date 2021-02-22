@@ -16,7 +16,7 @@ internal extension Data {
             }
             bytes[index >> 1] |= n
         }
-        self = Data(bytes: bytes)
+        self = Data(bytes)
     }
 
     struct HexEncodingOptions: OptionSet {

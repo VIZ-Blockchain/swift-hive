@@ -1,4 +1,4 @@
-@testable import Steem
+@testable import VIZ
 import XCTest
 
 fileprivate let sig = Signature(
@@ -18,6 +18,6 @@ class SignatureTest: XCTestCase {
     }
 
     func testRecover() {
-        XCTAssertEqual(sig.recover(message: Data(count: 32)), PublicKey("STM6BohVaUq55WgAD38pYVMZE4oxmoX7hAgxsni5EdNdgaKJ8FQDR"))
+        XCTAssertEqual(sig.recover(message: Data(count: 32)), PublicKey("VIZ6BohVaUq55WgAD38pYVMZE4oxmoX7hAgxsni5EdNdgaKJ8FQDR"))
     }
 }

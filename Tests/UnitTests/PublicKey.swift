@@ -1,12 +1,12 @@
-@testable import Steem
+@testable import VIZ
 import XCTest
 
 class PublicKeyTest: XCTestCase {
     func testKey() {
-        if let key = PublicKey("STM6672Ei8X4yMfDmEhBD66xfpG177qrbuic8KpUe1GVV9GVGovcv") {
-            XCTAssertEqual(String(key), "STM6672Ei8X4yMfDmEhBD66xfpG177qrbuic8KpUe1GVV9GVGovcv")
+        if let key = PublicKey("VIZ6LiKWipnNoBSDafStzSUgo9ihGawo25WW9kMvfTpGMwKp2qfG9") {
+            XCTAssertEqual(String(key), "VIZ6LiKWipnNoBSDafStzSUgo9ihGawo25WW9kMvfTpGMwKp2qfG9")
             XCTAssertEqual(key.prefix, .mainNet)
-            XCTAssertEqual(key.prefix, "STM")
+            XCTAssertEqual(key.prefix, "VIZ")
         } else {
             XCTFail("Unable to decode key")
         }
@@ -14,16 +14,6 @@ class PublicKeyTest: XCTestCase {
 
     func testNullKey() {
         XCTAssertNotNil(PublicKey("STM1111111111111111111111111111111114T1Anm"))
-    }
-
-    func testTestnetKey() {
-        if let key = PublicKey("TST4zDbsttSXXAezyNFz8GhN6zKka1Zh4GwA9sBgdjLjoW9BdnYTD") {
-            XCTAssertEqual(String(key), "TST4zDbsttSXXAezyNFz8GhN6zKka1Zh4GwA9sBgdjLjoW9BdnYTD")
-            XCTAssertEqual(key.prefix, .testNet)
-            XCTAssertEqual(key.prefix, "TST")
-        } else {
-            XCTFail("Unable to decode key")
-        }
     }
 
     func testCustomKey() {

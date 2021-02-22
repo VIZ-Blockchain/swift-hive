@@ -1,4 +1,4 @@
-/// Steem-flavoured JSON-RPC 2.0 client.
+/// JSON-RPC 2.0 client.
 /// - Author: Johan Nordberg <johan@steemit.com>
 
 import AnyCodable
@@ -12,7 +12,7 @@ import Foundation
 ///         let hello: String
 ///         let foo: Int
 ///     }
-///     struct MyRequest: Steem.Request {
+///     struct MyRequest: VIZ.Request {
 ///         typealias Response = MyResponse
 ///         let method = "my_method"
 ///         let params: RequestParams<String>
@@ -26,6 +26,7 @@ public protocol Request {
     associatedtype Response: Decodable
     /// Request parameter type.
     associatedtype Params: Encodable
+    var api: String { get }
     /// JSON-RPC 2.0 method to call.
     var method: String { get }
     /// JSON-RPC 2.0 parameters
@@ -34,6 +35,36 @@ public protocol Request {
 
 // Default implementation sends a request without params.
 extension Request {
+    public var api: String {
+        switch method {
+        case "get_key_references":
+            return "account_by_key"
+        case "get_account_history":
+            return "account_history"
+        case "get_committee_request", "get_committee_request_votes", "get_committee_requests_list":
+            return "committee_api"
+        case "get_account":
+            return "custom_protocol_api"
+        case "get_block", "get_block_header", "set_block_applied_callback", "get_chain_properties", "get_config", "get_database_info", "get_dynamic_global_properties", "get_hardfork_version", "get_next_scheduled_hardfork":
+            return "database_api"
+        case "get_account_count", "get_accounts", "get_accounts_on_sale", "get_escrow", "get_expiring_vesting_delegations", "get_owner_history", "get_recovery_request", "get_subaccounts_on_sale", "get_vesting_delegations", "get_withdraw_routes", "lookup_account_names", "lookup_accounts":
+            return "database_api"
+        case "get_potential_signatures", "get_proposed_transaction", "get_proposed_transactions", "get_required_signatures", "get_transaction_hex", "verify_account_authority", "verify_authority":
+            return "database_api"
+        case "get_invite_by_id", "get_invite_by_key", "get_invites_list":
+            return "invite_api"
+        case "broadcast_block", "broadcast_transaction", "broadcast_transaction_synchronous", "broadcast_transaction_with_callback":
+            return "network_broadcast_api"
+        case "get_ops_in_block", "get_transaction":
+            return "operation_history"
+        case "get_active_paid_subscriptions", "get_inactive_paid_subscriptions", "get_paid_subscription_options", "get_paid_subscription_status", "get_paid_subscriptions":
+            return "paid_subscription_api"
+        case "get_active_witnesses", "get_witness_by_account", "get_witness_count", "get_witness_schedule", "get_witnesses", "get_witnesses_by_counted_vote", "get_witnesses_by_vote", "lookup_witness_accounts":
+            return "witness_api"
+        default:
+            return method
+        }
+    }
     public var params: RequestParams<AnyEncodable>? {
         return nil
     }
@@ -83,7 +114,7 @@ extension RequestParams: Encodable {
 }
 
 /// JSON-RPC 2.0 request payload wrapper.
-internal struct RequestPayload<Request: Steem.Request> {
+internal struct RequestPayload<Request: VIZ.Request> {
     let request: Request
     let id: Int
 }
@@ -95,13 +126,27 @@ extension RequestPayload: Encodable {
         case method
         case params
     }
+    
+    struct Params: Encodable {
+        let api: String
+        let method: String
+        let params: Request.Params?
+        
+        func encode(to encoder: Encoder) throws {
+            var container = encoder.unkeyedContainer()
+            try container.encode(api)
+            try container.encode(method)
+            try container.encode(params)
+        }
+    }
 
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: Keys.self)
         try container.encode(self.id, forKey: .id)
         try container.encode("2.0", forKey: .jsonrpc)
-        try container.encode(self.request.method, forKey: .method)
-        try container.encodeIfPresent(self.request.params, forKey: .params)
+        try container.encode("call", forKey: .method)
+        let params = Params(api: self.request.api, method: self.request.method, params: self.request.params)
+        try container.encode(params, forKey: .params)
     }
 }
 
@@ -159,7 +204,7 @@ internal struct SeqIdGenerator: IdGenerator {
     }
 }
 
-/// Steem-flavoured JSON-RPC 2.0 client.
+/// VIZ-flavoured JSON-RPC 2.0 client.
 public class Client {
     /// All errors `Client` can throw.
     public enum Error: LocalizedError {
@@ -205,7 +250,7 @@ public class Client {
         let encoder = Client.JSONEncoder()
         var urlRequest = URLRequest(url: self.address)
         urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        urlRequest.setValue("swift-steem/1.0", forHTTPHeaderField: "User-Agent")
+        urlRequest.setValue("swift-viz/1.0", forHTTPHeaderField: "User-Agent")
         urlRequest.httpMethod = "POST"
         urlRequest.httpBody = try encoder.encode(payload)
         return urlRequest
@@ -296,7 +341,7 @@ public class Client {
 
 /// JSON Coding helpers.
 extension Client {
-    /// Steem-style date formatter (ISO 8601 minus Z at the end).
+    /// VIZ-style date formatter (ISO 8601 minus Z at the end).
     public static let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.calendar = Calendar(identifier: .iso8601)
@@ -329,7 +374,7 @@ extension Client {
         return Data(hexEncoded: try container.decode(String.self))
     }
 
-    /// Returns a JSONDecoder instance configured for the Steem JSON format.
+    /// Returns a JSONDecoder instance configured for the VIZ JSON format.
     public static func JSONDecoder() -> Foundation.JSONDecoder {
         let decoder = Foundation.JSONDecoder()
         decoder.dataDecodingStrategy = dataDecoder
@@ -340,7 +385,7 @@ extension Client {
         return decoder
     }
 
-    /// Returns a JSONEncoder instance configured for the Steem JSON format.
+    /// Returns a JSONEncoder instance configured for the VIZ JSON format.
     public static func JSONEncoder() -> Foundation.JSONEncoder {
         let encoder = Foundation.JSONEncoder()
         encoder.dataEncodingStrategy = dataEncoder

@@ -1,26 +1,24 @@
-/// Steem token types.
+/// VIZ token types.
 /// - Author: Johan Nordberg <johan@steemit.com>
 /// - Author: Iain Maitland <imaitland@steemit.com>
 
 import Foundation
 
-/// The Steem asset type.
+/// The VIZ asset type.
 public struct Asset: Equatable {
     /// Asset symbol type, containing the symbol name and precision.
     public enum Symbol: Equatable {
-        /// The STEEM token.
-        case steem
+        /// The VIZ token.
+        case viz
         /// Vesting shares.
         case vests
-        /// Steem-backed dollars.
-        case sbd
         /// Custom token.
         case custom(name: String, precision: UInt8)
 
         /// Number of decimal points represented.
         public var precision: UInt8 {
             switch self {
-            case .steem, .sbd:
+            case .viz:
                 return 3
             case .vests:
                 return 6
@@ -29,13 +27,11 @@ public struct Asset: Equatable {
             }
         }
 
-        /// String representation of symbol prefix, e.g. "STEEM".
+        /// String representation of symbol prefix, e.g. "VIZ".
         public var name: String {
             switch self {
-            case .steem:
-                return "STEEM"
-            case .sbd:
-                return "SBD"
+            case .viz:
+                return "VIZ"
             case .vests:
                 return "VESTS"
             case let .custom(name, _):
@@ -51,13 +47,13 @@ public struct Asset: Equatable {
     /// Create a new `Asset`.
     /// - Parameter value: Amount of tokens.
     /// - Parameter symbol: Token symbol.
-    public init(_ value: Double, _ symbol: Symbol = .steem) {
+    public init(_ value: Double, _ symbol: Symbol = .viz) {
         self.amount = Int64(round(value * pow(10, Double(symbol.precision))))
         self.symbol = symbol
     }
 
     /// Create a new `Asset` from a string representation.
-    /// - Parameter value: String to parse into asset, e.g. `1.000 STEEM`.
+    /// - Parameter value: String to parse into asset, e.g. `1.000 VIZ`.
     public init?(_ value: String) {
         let parts = value.split(separator: " ")
         guard parts.count == 2 else {
@@ -65,12 +61,10 @@ public struct Asset: Equatable {
         }
         let symbol: Symbol
         switch parts[1] {
-        case "STEEM":
-            symbol = .steem
+        case "VIZ":
+            symbol = .viz
         case "VESTS":
             symbol = .vests
-        case "SBD":
-            symbol = .sbd
         default:
             let ap = parts[0].split(separator: ".")
             let precision: UInt8 = ap.count == 2 ? UInt8(ap[1].count) : 0
@@ -80,35 +74,6 @@ public struct Asset: Equatable {
             return nil
         }
         self.init(val, symbol)
-    }
-}
-
-enum PriceError: Error {
-    case cannotConvert(asset: Asset, usingPrice: Price)
-}
-
-/// Type representing a quotation of the relative value of asset against another asset.
-public struct Price: Equatable, SteemEncodable, Decodable {
-    /// The base asset.
-    public var base: Asset
-    /// The quote asset.
-    public var quote: Asset
-    /// Use the Price base and quote Assets to convert between Asset amounts.
-    public func convert(asset: Asset) throws -> Asset {
-        if asset.symbol == self.base.symbol {
-            assert(self.base.resolvedAmount > 0)
-            return Asset(asset.resolvedAmount * self.quote.resolvedAmount / self.base.resolvedAmount, self.quote.symbol)
-        } else if asset.symbol == self.quote.symbol {
-            assert(self.quote.resolvedAmount > 0)
-            return Asset(asset.resolvedAmount * self.base.resolvedAmount / self.quote.resolvedAmount, self.base.symbol)
-        } else {
-            throw PriceError.cannotConvert(asset: asset, usingPrice: self)
-        }
-    }
-
-    public init(base: Asset, quote: Asset) {
-        self.base = base
-        self.quote = quote
     }
 }
 
@@ -134,7 +99,7 @@ extension Asset: LosslessStringConvertible {
     }
 }
 
-extension Asset: SteemEncodable, Decodable {
+extension Asset: VIZEncodable, Decodable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         let value = try container.decode(String.self)
@@ -149,7 +114,7 @@ extension Asset: SteemEncodable, Decodable {
         try container.encode(String(self))
     }
 
-    public func binaryEncode(to encoder: SteemEncoder) throws {
+    public func binaryEncode(to encoder: VIZEncoder) throws {
         try encoder.encode(self.amount)
         try encoder.encode(self.symbol.precision)
         let chars = self.symbol.name.utf8

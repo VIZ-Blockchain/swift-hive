@@ -1,4 +1,4 @@
-@testable import Steem
+@testable import VIZ
 import XCTest
 
 class Sha2Test: XCTestCase {

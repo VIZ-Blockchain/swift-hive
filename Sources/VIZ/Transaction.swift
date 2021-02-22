@@ -1,10 +1,10 @@
-/// Steem transaction type.
+/// VIZ transaction type.
 /// - Author: Johan Nordberg <johan@steemit.com>
 
 import AnyCodable
 import Foundation
 
-fileprivate protocol _Transaction: SteemEncodable, Decodable {
+fileprivate protocol _Transaction: VIZEncodable, Decodable {
     /// Block number reference.
     var refBlockNum: UInt16 { get }
     /// Block number reference id.
@@ -54,7 +54,7 @@ public struct Transaction: _Transaction {
     /// SHA2-256 digest for signing.
     public func digest(forChain chain: ChainId = .mainNet) throws -> Data {
         var data = chain.data
-        data.append(try SteemEncoder.encode(self))
+        data.append(try VIZEncoder.encode(self))
         return data.sha256Digest()
     }
 }
@@ -171,7 +171,7 @@ extension SignedTransaction {
 // Workaround for: Swift runtime does not yet support dynamically querying conditional conformance.
 #if !swift(>=4.2)
     extension Transaction {
-        public func binaryEncode(to encoder: SteemEncoder) throws {
+        public func binaryEncode(to encoder: VIZEncoder) throws {
             try encoder.encode(self.refBlockNum)
             try encoder.encode(self.refBlockPrefix)
             try encoder.encode(self.expiration)

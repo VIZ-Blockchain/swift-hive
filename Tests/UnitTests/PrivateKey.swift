@@ -1,4 +1,4 @@
-@testable import Steem
+@testable import VIZ
 import XCTest
 
 class PrivateKeyTest: XCTestCase {
@@ -15,7 +15,7 @@ class PrivateKeyTest: XCTestCase {
         XCTAssertNil(PrivateKey("5HsQCyqCw61VPQ9tN4ttasHW3AH6cJ6tJdneAXR8gUJ2MWyxxpa"))
         XCTAssertNil(PrivateKey("5HsQCyqCw61VPQ6tN4ttasHW3AH6cJ6tJdneAXR8gUJ2MWyxxpA"))
         XCTAssertNil(PrivateKey(Data()))
-        XCTAssertNil(PrivateKey(Data(bytes: [0x80])))
+        XCTAssertNil(PrivateKey(Data([0x80])))
     }
 
     func testEquatable() {
@@ -34,8 +34,8 @@ class PrivateKeyTest: XCTestCase {
 
     func testCreatePublic() {
         if let key = PrivateKey("5HsQCyqCw61VPQ9tN4ttasHW3AH6cJ6tJdneAXR8gUJ2MWyxxpA") {
-            XCTAssertEqual(key.createPublic(), PublicKey("STM6BohVaUq55WgAD38pYVMZE4oxmoX7hAgxsni5EdNdgaKJ8FQDR"))
-            XCTAssertEqual(key.createPublic(prefix: .testNet), PublicKey("TST6BohVaUq55WgAD38pYVMZE4oxmoX7hAgxsni5EdNdgaKJ8FQDR"))
+            XCTAssertEqual(key.createPublic(), PublicKey("VIZ6BohVaUq55WgAD38pYVMZE4oxmoX7hAgxsni5EdNdgaKJ8FQDR"))
+//            XCTAssertEqual(key.createPublic(prefix: .testNet), PublicKey("VIZ6BohVaUq55WgAD38pYVMZE4oxmoX7hAgxsni5EdNdgaKJ8FQDR"))
             XCTAssertEqual(key.createPublic(prefix: "FOO"), PublicKey("FOO6BohVaUq55WgAD38pYVMZE4oxmoX7hAgxsni5EdNdgaKJ8FQDR"))
         } else {
             XCTFail("Unable to decode WIF")

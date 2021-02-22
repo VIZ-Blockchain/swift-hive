@@ -2,7 +2,9 @@
 /.build
 /Packages
 /*.xcodeproj
+xcuserdata/
 Package.resolved
 /build
 /docs
 /.gh-pages
+.swiftpm

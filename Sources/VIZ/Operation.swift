@@ -1,10 +1,10 @@
-/// Steem operation types.
+/// VIZ operation types.
 /// - Author: Johan Nordberg <johan@steemit.com>
 
 import Foundation
 
-/// A type that represents a operation on the Steem blockchain.
-public protocol OperationType: SteemCodable {
+/// A type that represents a operation on the VIZ blockchain.
+public protocol OperationType: VIZCodable {
     /// Whether the operation is virtual or not.
     var isVirtual: Bool { get }
 }
@@ -13,7 +13,7 @@ extension OperationType {
     public var isVirtual: Bool { return false }
 }
 
-/// Namespace for all available Steem operations.
+/// Namespace for all available VIZ operations.
 public struct Operation {
     /// Voting operation, votes for content.
     public struct Vote: OperationType, Equatable {
@@ -100,13 +100,13 @@ public struct Operation {
         }
     }
 
-    /// Converts STEEM to VESTS, aka. "Powering Up".
+    /// Converts VIZ to VESTS, aka. "Powering Up".
     public struct TransferToVesting: OperationType, Equatable {
         /// Account name of sender.
         public var from: String
         /// Account name of reciever.
         public var to: String
-        /// Amount to power up, must be STEEM.
+        /// Amount to power up, must be VIZ.
         public var amount: Asset
 
         public init(from: String, to: String, amount: Asset) {
@@ -129,54 +129,6 @@ public struct Operation {
         }
     }
 
-    /// This operation creates a limit order and matches it against existing open orders.
-    public struct LimitOrderCreate: OperationType, Equatable {
-        public var owner: String
-        public var orderid: UInt32
-        public var amountToSell: Asset
-        public var minToReceive: Asset
-        public var fillOrKill: Bool
-        public var expiration: Date
-
-        public init(
-            owner: String,
-            orderid: UInt32,
-            amountToSell: Asset,
-            minToReceive: Asset,
-            fillOrKill: Bool,
-            expiration: Date
-        ) {
-            self.owner = owner
-            self.orderid = orderid
-            self.amountToSell = amountToSell
-            self.minToReceive = minToReceive
-            self.fillOrKill = fillOrKill
-            self.expiration = expiration
-        }
-    }
-
-    /// Cancels an order and returns the balance to owner.
-    public struct LimitOrderCancel: OperationType, Equatable {
-        public var owner: String
-        public var orderid: UInt32
-
-        public init(owner: String, orderid: UInt32) {
-            self.owner = owner
-            self.orderid = orderid
-        }
-    }
-
-    /// Publish a price feed.
-    public struct FeedPublish: OperationType, Equatable {
-        public var publisher: String
-        public var exchangeRate: Price
-
-        public init(publisher: String, exchangeRate: Price) {
-            self.publisher = publisher
-            self.exchangeRate = exchangeRate
-        }
-    }
-
     /// Convert operation.
     public struct Convert: OperationType, Equatable {
         public var owner: String
@@ -195,9 +147,9 @@ public struct Operation {
         public var fee: Asset
         public var creator: String
         public var newAccountName: String
-        public var owner: Authority
+        public var master: Authority
         public var active: Authority
-        public var posting: Authority
+        public var regular: Authority
         public var memoKey: PublicKey
         public var jsonMetadata: JSONString
 
@@ -205,18 +157,18 @@ public struct Operation {
             fee: Asset,
             creator: String,
             newAccountName: String,
-            owner: Authority,
+            master: Authority,
             active: Authority,
-            posting: Authority,
+            regular: Authority,
             memoKey: PublicKey,
             jsonMetadata: JSONString = ""
         ) {
             self.fee = fee
             self.creator = creator
             self.newAccountName = newAccountName
-            self.owner = owner
+            self.master = master
             self.active = active
-            self.posting = posting
+            self.regular = regular
             self.memoKey = memoKey
             self.jsonMetadata = jsonMetadata
         }
@@ -231,24 +183,24 @@ public struct Operation {
     /// Updates an account.
     public struct AccountUpdate: OperationType, Equatable {
         public var account: String
-        public var owner: Authority?
-        public var active: Authority?
-        public var posting: Authority?
+        public var masterAuthority: Authority?
+        public var activeAuthority: Authority?
+        public var regularAuthority: Authority?
         public var memoKey: PublicKey
         public var jsonMetadata: String
 
         public init(
             account: String,
-            owner: Authority?,
-            active: Authority?,
-            posting: Authority?,
+            masterAuthority: Authority?,
+            activeAuthority: Authority?,
+            regularAuthority: Authority?,
             memoKey: PublicKey,
             jsonMetadata: String = ""
         ) {
             self.account = account
-            self.owner = owner
-            self.active = active
-            self.posting = posting
+            self.masterAuthority = masterAuthority
+            self.activeAuthority = activeAuthority
+            self.regularAuthority = regularAuthority
             self.memoKey = memoKey
             self.jsonMetadata = jsonMetadata
         }
@@ -257,7 +209,7 @@ public struct Operation {
     /// Registers or updates witnesses.
     public struct WitnessUpdate: OperationType, Equatable {
         /// Witness chain properties.
-        public struct Properties: SteemCodable, Equatable {
+        public struct Properties: VIZCodable, Equatable {
 //            public var accountCreationFee: Asset
 //            public var maximumBlockSize: UInt32
 //            public var sbdInterestRate: UInt16
@@ -313,16 +265,19 @@ public struct Operation {
 
     /// Custom operation.
     public struct Custom: OperationType, Equatable {
-        public var requiredAuths: [String]
+        public var requiredRegularAuths: [String]
+        public var requiredActiveAuths: [String]
         public var id: UInt16
         public var data: Data
 
         public init(
-            requiredAuths: [String],
+            requiredRegularAuths: [String],
+            requiredActiveAuths: [String],
             id: UInt16,
             data: Data
         ) {
-            self.requiredAuths = requiredAuths
+            self.requiredRegularAuths = requiredRegularAuths
+            self.requiredActiveAuths = requiredActiveAuths
             self.id = id
             self.data = data
         }
@@ -378,13 +333,13 @@ public struct Operation {
 
     /// Sets comment options.
     public struct CommentOptions: OperationType, Equatable {
-        public struct BeneficiaryRoute: SteemCodable, Equatable {
+        public struct BeneficiaryRoute: VIZCodable, Equatable {
             public var account: String
             public var weight: UInt16
         }
 
         /// Comment option extensions.
-        public enum Extension: SteemCodable, Equatable {
+        public enum Extension: VIZCodable, Equatable {
             /// Unknown extension.
             case unknown
             /// Comment payout routing.
@@ -435,32 +390,6 @@ public struct Operation {
             self.toAccount = toAccount
             self.percent = percent
             self.autoVest = autoVest
-        }
-    }
-
-    /// Creates a limit order using a exchange price.
-    public struct LimitOrderCreate2: OperationType, Equatable {
-        public var owner: String
-        public var orderid: UInt32
-        public var amountToSell: Asset
-        public var fillOrKill: Bool
-        public var exchangeRate: Price
-        public var expiration: Date
-
-        public init(
-            owner: String,
-            orderid: UInt32,
-            amountToSell: Asset,
-            fillOrKill: Bool,
-            exchangeRate: Price,
-            expiration: Date
-        ) {
-            self.owner = owner
-            self.orderid = orderid
-            self.amountToSell = amountToSell
-            self.fillOrKill = fillOrKill
-            self.exchangeRate = exchangeRate
-            self.expiration = expiration
         }
     }
 
@@ -835,9 +764,9 @@ public struct Operation {
         public var delegation: Asset
         public var creator: String
         public var newAccountName: String
-        public var owner: Authority
+        public var master: Authority
         public var active: Authority
-        public var posting: Authority
+        public var regular: Authority
         public var memoKey: PublicKey
         public var jsonMetadata: JSONString
         public var extensions: [FutureExtensions]
@@ -847,9 +776,9 @@ public struct Operation {
             delegation: Asset,
             creator: String,
             newAccountName: String,
-            owner: Authority,
+            master: Authority,
             active: Authority,
-            posting: Authority,
+            regular: Authority,
             memoKey: PublicKey,
             jsonMetadata: JSONString = "",
             extensions: [FutureExtensions] = []
@@ -858,9 +787,9 @@ public struct Operation {
             self.delegation = delegation
             self.creator = creator
             self.newAccountName = newAccountName
-            self.owner = owner
+            self.master = master
             self.active = active
-            self.posting = posting
+            self.regular = regular
             self.memoKey = memoKey
             self.jsonMetadata = jsonMetadata
             self.extensions = extensions
@@ -981,6 +910,15 @@ public struct Operation {
         public let producer: String
         public let vestingShares: Asset
     }
+    
+    public struct Award: OperationType, Equatable {
+        public let initiator: String
+        public let receiver: String
+        public let energy: UInt16
+        public let customSequence: UInt64
+        public let memo: String
+//        public let beneficiaries: [Beneficiary]
+    }
 
     /// Unknown operation, seen if the decoder encounters operation which has no type defined.
     /// - Note: Not encodable, the encoder will throw if encountering this operation.
@@ -990,15 +928,15 @@ public struct Operation {
 // MARK: - Encoding
 
 /// Operation ID, used for coding.
-fileprivate enum OperationId: UInt8, SteemEncodable, Decodable {
+fileprivate enum OperationId: UInt8, VIZEncodable, Decodable {
     case vote = 0
     case comment = 1
     case transfer = 2
     case transfer_to_vesting = 3
     case withdraw_vesting = 4
-    case limit_order_create = 5
-    case limit_order_cancel = 6
-    case feed_publish = 7
+//    case limit_order_create = 5
+//    case limit_order_cancel = 6
+//    case feed_publish = 7
     case convert = 8
     case account_create = 9
     case account_update = 10
@@ -1012,7 +950,7 @@ fileprivate enum OperationId: UInt8, SteemEncodable, Decodable {
     case custom_json = 18
     case comment_options = 19
     case set_withdraw_vesting_route = 20
-    case limit_order_create2 = 21
+//    case limit_order_create2 = 21
     case challenge_authority = 22
     case prove_authority = 23
     case request_account_recovery = 24
@@ -1033,7 +971,6 @@ fileprivate enum OperationId: UInt8, SteemEncodable, Decodable {
     case claim_reward_balance = 39
     case delegate_vesting_shares = 40
     case account_create_with_delegation = 41
-    // Virtual operations
     case fill_convert_request
     case author_reward
     case curation_reward
@@ -1049,6 +986,21 @@ fileprivate enum OperationId: UInt8, SteemEncodable, Decodable {
     case return_vesting_delegation
     case comment_benefactor_reward
     case producer_reward
+    case create_invite
+    case claim_invite_balance
+    case invite_registration
+    case versioned_chain_properties_update
+    case award
+    case receive_award //Virtual Operation
+    case benefactor_award //Virtual Operation
+    case set_paid_subscription
+    case paid_subscribe
+    case paid_subscription_action //Virtual Operation
+    case cancel_paid_subscription //Virtual Operation
+    case set_account_price
+    case set_subaccount_price
+    case buy_account
+    case account_sale //Virtual Operation
     case unknown = 255
 
     init(from decoder: Decoder) throws {
@@ -1060,9 +1012,6 @@ fileprivate enum OperationId: UInt8, SteemEncodable, Decodable {
         case "transfer": self = .transfer
         case "transfer_to_vesting": self = .transfer_to_vesting
         case "withdraw_vesting": self = .withdraw_vesting
-        case "limit_order_create": self = .limit_order_create
-        case "limit_order_cancel": self = .limit_order_cancel
-        case "feed_publish": self = .feed_publish
         case "convert": self = .convert
         case "account_create": self = .account_create
         case "account_update": self = .account_update
@@ -1076,7 +1025,6 @@ fileprivate enum OperationId: UInt8, SteemEncodable, Decodable {
         case "custom_json": self = .custom_json
         case "comment_options": self = .comment_options
         case "set_withdraw_vesting_route": self = .set_withdraw_vesting_route
-        case "limit_order_create2": self = .limit_order_create2
         case "challenge_authority": self = .challenge_authority
         case "prove_authority": self = .prove_authority
         case "request_account_recovery": self = .request_account_recovery
@@ -1112,6 +1060,21 @@ fileprivate enum OperationId: UInt8, SteemEncodable, Decodable {
         case "return_vesting_delegation": self = .return_vesting_delegation
         case "comment_benefactor_reward": self = .comment_benefactor_reward
         case "producer_reward": self = .producer_reward
+        case "create_invite": self = .create_invite
+        case "claim_invite_balance": self = .claim_invite_balance
+        case "invite_registration": self = .invite_registration
+        case "versioned_chain_properties_update": self = .versioned_chain_properties_update
+        case "award": self = .award
+        case "receive_award": self = .receive_award //Virtual Operation
+        case "benefactor_award": self = .benefactor_award //Virtual Operation
+        case "set_paid_subscription": self = .set_paid_subscription
+        case "paid_subscribe": self = .paid_subscribe
+        case "paid_subscription_action": self = .paid_subscription_action //Virtual Operation
+        case "cancel_paid_subscription": self = .cancel_paid_subscription //Virtual Operation
+        case "set_account_price": self = .set_account_price
+        case "set_subaccount_price": self = .set_subaccount_price
+        case "buy_account": self = .buy_account
+        case "account_sale": self = .account_sale //Virtual Operation
         default: self = .unknown
         }
     }
@@ -1121,13 +1084,13 @@ fileprivate enum OperationId: UInt8, SteemEncodable, Decodable {
         try container.encode("\(self)")
     }
 
-    func binaryEncode(to encoder: SteemEncoder) throws {
+    func binaryEncode(to encoder: VIZEncoder) throws {
         try encoder.encode(self.rawValue)
     }
 }
 
-/// A type-erased Steem operation.
-internal struct AnyOperation: SteemEncodable, Decodable {
+/// A type-erased VIZ operation.
+internal struct AnyOperation: VIZEncodable, Decodable {
     public let operation: OperationType
 
     /// Create a new operation wrapper.
@@ -1149,9 +1112,6 @@ internal struct AnyOperation: SteemEncodable, Decodable {
         case .transfer: op = try container.decode(Operation.Transfer.self)
         case .transfer_to_vesting: op = try container.decode(Operation.TransferToVesting.self)
         case .withdraw_vesting: op = try container.decode(Operation.WithdrawVesting.self)
-        case .limit_order_create: op = try container.decode(Operation.LimitOrderCancel.self)
-        case .limit_order_cancel: op = try container.decode(Operation.LimitOrderCancel.self)
-        case .feed_publish: op = try container.decode(Operation.FeedPublish.self)
         case .convert: op = try container.decode(Operation.Convert.self)
         case .account_create: op = try container.decode(Operation.AccountCreate.self)
         case .account_update: op = try container.decode(Operation.AccountUpdate.self)
@@ -1165,7 +1125,6 @@ internal struct AnyOperation: SteemEncodable, Decodable {
         case .custom_json: op = try container.decode(Operation.CustomJson.self)
         case .comment_options: op = try container.decode(Operation.CommentOptions.self)
         case .set_withdraw_vesting_route: op = try container.decode(Operation.SetWithdrawVestingRoute.self)
-        case .limit_order_create2: op = try container.decode(Operation.LimitOrderCreate2.self)
         case .challenge_authority: op = try container.decode(Operation.ChallengeAuthority.self)
         case .prove_authority: op = try container.decode(Operation.ProveAuthority.self)
         case .request_account_recovery: op = try container.decode(Operation.RequestAccountRecovery.self)
@@ -1201,6 +1160,23 @@ internal struct AnyOperation: SteemEncodable, Decodable {
         case .return_vesting_delegation: op = try container.decode(Operation.ReturnVestingDelegation.self)
         case .comment_benefactor_reward: op = try container.decode(Operation.CommentBenefactorReward.self)
         case .producer_reward: op = try container.decode(Operation.ProducerReward.self)
+            
+        case .create_invite: op = Operation.Unknown()
+        case .claim_invite_balance: op = Operation.Unknown()
+        case .invite_registration: op = Operation.Unknown()
+        case .versioned_chain_properties_update: op = Operation.Unknown()
+        case .award: op = try container.decode(Operation.Award.self)
+        case .receive_award: op = Operation.Unknown()
+        case .benefactor_award: op = Operation.Unknown()
+        case .set_paid_subscription: op = Operation.Unknown()
+        case .paid_subscribe: op = Operation.Unknown()
+        case .paid_subscription_action: op = Operation.Unknown()
+        case .cancel_paid_subscription: op = Operation.Unknown()
+        case .set_account_price: op = Operation.Unknown()
+        case .set_subaccount_price: op = Operation.Unknown()
+        case .buy_account: op = Operation.Unknown()
+        case .account_sale: op = Operation.Unknown()
+            
         case .unknown: op = Operation.Unknown()
         }
         self.operation = op
@@ -1223,15 +1199,6 @@ internal struct AnyOperation: SteemEncodable, Decodable {
             try container.encode(op)
         case let op as Operation.WithdrawVesting:
             try container.encode(OperationId.withdraw_vesting)
-            try container.encode(op)
-        case let op as Operation.LimitOrderCreate:
-            try container.encode(OperationId.limit_order_create)
-            try container.encode(op)
-        case let op as Operation.LimitOrderCancel:
-            try container.encode(OperationId.limit_order_cancel)
-            try container.encode(op)
-        case let op as Operation.FeedPublish:
-            try container.encode(OperationId.feed_publish)
             try container.encode(op)
         case let op as Operation.Convert:
             try container.encode(OperationId.convert)
@@ -1271,9 +1238,6 @@ internal struct AnyOperation: SteemEncodable, Decodable {
             try container.encode(op)
         case let op as Operation.SetWithdrawVestingRoute:
             try container.encode(OperationId.set_withdraw_vesting_route)
-            try container.encode(op)
-        case let op as Operation.LimitOrderCreate2:
-            try container.encode(OperationId.limit_order_create2)
             try container.encode(op)
         case let op as Operation.ChallengeAuthority:
             try container.encode(OperationId.challenge_authority)
@@ -1335,6 +1299,9 @@ internal struct AnyOperation: SteemEncodable, Decodable {
         case let op as Operation.AccountCreateWithDelegation:
             try container.encode(OperationId.account_create_with_delegation)
             try container.encode(op)
+        case let op as Operation.Award:
+            try container.encode(OperationId.award)
+            try container.encode(op)
         default:
             throw EncodingError.invalidValue(self.operation, EncodingError.Context(
                 codingPath: container.codingPath, debugDescription: "Encountered unknown operation type"
@@ -1343,7 +1310,7 @@ internal struct AnyOperation: SteemEncodable, Decodable {
     }
 }
 
-fileprivate struct BeneficiaryWrapper: SteemEncodable, Equatable, Decodable {
+fileprivate struct BeneficiaryWrapper: VIZEncodable, Equatable, Decodable {
     var beneficiaries: [Operation.CommentOptions.BeneficiaryRoute]
 }
 

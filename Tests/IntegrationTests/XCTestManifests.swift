@@ -2,10 +2,10 @@ import XCTest
 
 extension ClientTest {
     static let __allTests = [
-        ("testBroadcast", testBroadcast),
+//        ("testBroadcast", testBroadcast),
         ("testGetBlock", testGetBlock),
         ("testGlobalProps", testGlobalProps),
-        ("testRequest", testRequest),
+//        ("testRequest", testRequest),
     ]
 }
 

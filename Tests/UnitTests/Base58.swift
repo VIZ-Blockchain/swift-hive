@@ -1,4 +1,4 @@
-@testable import Steem
+@testable import VIZ
 import XCTest
 
 let base64_base58_pairs = [
