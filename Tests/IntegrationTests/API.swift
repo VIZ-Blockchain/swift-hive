@@ -44,50 +44,44 @@ class ClientTest: XCTestCase {
         }
     }
 
-//    func testBroadcast() {
-//        let test = expectation(description: "Response")
-//        let key = PrivateKey("5KS8eoAGLrCg2w3ytqSQXsmHuDTdvb2NLjJLpxgaiVJDXaGpcGT")!
-//        var comment = Operation.Comment(
-//            title: "Hello from Swift",
-//            body: "The time is \(Date()) and I'm running tests.",
-//            author: "test19",
-//            permlink: "hey-eveyone-im-running-swift-tests-and-the-time-is-\(UInt32(Date().timeIntervalSinceReferenceDate))"
-//        )
-//        comment.parentPermlink = "test"
-//        let vote = Operation.Vote(voter: "test19", author: "test19", permlink: comment.permlink)
-//        testnetClient.send(API.GetDynamicGlobalProperties()) { props, error in
-//            XCTAssertNil(error)
-//            guard let props = props else {
-//                return XCTFail("Unable to get props")
-//            }
-//            let expiry = props.time.addingTimeInterval(60)
-//            let tx = Transaction(
-//                refBlockNum: UInt16(props.headBlockNumber & 0xFFFF),
-//                refBlockPrefix: props.headBlockId.prefix,
-//                expiration: expiry,
-//                operations: [comment, vote]
-//            )
-//
-//            guard let stx = try? tx.sign(usingKey: key, forChain: testnetId) else {
-//                return XCTFail("Unable to sign tx")
-//            }
-//            testnetClient.send(API.BroadcastTransaction(transaction: stx)) { res, error in
-//                XCTAssertNil(error)
-//                if let res = res {
-//                    XCTAssertFalse(res.expired)
-//                    XCTAssert(res.blockNum > props.headBlockId.num)
-//                } else {
-//                    XCTFail("No response")
-//                }
-//                test.fulfill()
-//            }
-//        }
-//        waitForExpectations(timeout: 10) { error in
-//            if let error = error {
-//                print("Error: \(error.localizedDescription)")
-//            }
-//        }
-//    }
+    func testBroadcastAward() {
+        let test = expectation(description: "Response")
+        let key = PrivateKey("5K5exRbTT5d6HnAsNgdFptedttd8w9HnYXz3jfmPbK35GZQXqia")!
+        let award = Operation.Award(initiator: "babin", receiver: "babin", energy: 1, customSequence: 0, memo: "")
+        client.send(API.GetDynamicGlobalProperties()) { props, error in
+            XCTAssertNil(error)
+            guard let props = props else {
+                return XCTFail("Unable to get props")
+            }
+            let expiry = props.time.addingTimeInterval(60)
+            let tx = Transaction(
+                refBlockNum: UInt16(props.headBlockNumber & 0xFFFF),
+                refBlockPrefix: props.headBlockId.prefix,
+                expiration: expiry,
+                operations: [award]
+            )
+
+            guard let stx = try? tx.sign(usingKey: key) else {
+                return XCTFail("Unable to sign tx")
+            }
+            let trx = API.BroadcastTransaction(transaction: stx)
+            client.send(trx) { res, error in
+                XCTAssertNil(error)
+                if let res = res {
+                    XCTAssertFalse(res.expired)
+                    XCTAssert(res.blockNum > props.headBlockId.num)
+                } else {
+                    XCTFail("No response")
+                }
+                test.fulfill()
+            }
+        }
+        waitForExpectations(timeout: 10) { error in
+            if let error = error {
+                print("Error: \(error.localizedDescription)")
+            }
+        }
+    }
 //
 //    func testTransferBroadcast() {
 //        let test = expectation(description: "Response")

@@ -7,21 +7,6 @@ import Foundation
 
 /// VIZ RPC API request- and response-types.
 public struct API {
-    /// Wrapper for pre-appbase vizd calls.
-    public struct CallParams<T: Encodable>: Encodable {
-        let method: String
-        let params: [T]
-        init(_ method: String, _ params: [T]) {
-            self.method = method
-            self.params = params
-        }
-
-        public func encode(to encoder: Encoder) throws {
-            var container = encoder.unkeyedContainer()
-            try container.encode(method)
-            try container.encode(params)
-        }
-    }
 
     public struct DynamicGlobalProperties: Decodable {
         public let headBlockNumber: UInt32
@@ -66,10 +51,10 @@ public struct API {
 
     public struct BroadcastTransaction: Request {
         public typealias Response = TransactionConfirmation
-        public let method = "call"
-        public let params: CallParams<SignedTransaction>?
+        public let method = "broadcast_transaction_synchronous"
+        public let params: RequestParams<SignedTransaction>?
         public init(transaction: SignedTransaction) {
-            self.params = CallParams("broadcast_transaction_synchronous", [transaction])
+            self.params = RequestParams([transaction])
         }
     }
 
