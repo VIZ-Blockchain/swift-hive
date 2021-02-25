@@ -39,8 +39,8 @@ public struct Operation {
         }
     }
 
-    /// Comment operation, creates comments and posts.
-    public struct Comment: OperationType, Equatable {
+    /// Content operation, creates comments and posts.
+    public struct Content: OperationType, Equatable {
         /// The parent content author, left blank for top level posts.
         public var parentAuthor: String = ""
         /// The parent content permalink, left blank for top level posts.
@@ -301,7 +301,7 @@ public struct Operation {
     }
 
     /// Deletes a comment.
-    public struct DeleteComment: OperationType, Equatable {
+    public struct DeleteContent: OperationType, Equatable {
         public var author: String
         public var permlink: String
 
@@ -917,7 +917,12 @@ public struct Operation {
         public let energy: UInt16
         public let customSequence: UInt64
         public let memo: String
-//        public let beneficiaries: [Beneficiary]
+        public let beneficiaries: [Beneficiary]
+    }
+    
+    public struct Beneficiary: OperationType, Equatable {
+        public let account: String
+        public let weight: UInt16
     }
 
     /// Unknown operation, seen if the decoder encounters operation which has no type defined.
@@ -930,77 +935,65 @@ public struct Operation {
 /// Operation ID, used for coding.
 fileprivate enum OperationId: UInt8, VIZEncodable, Decodable {
     case vote = 0
-    case comment = 1
+    case content = 1
     case transfer = 2
     case transfer_to_vesting = 3
     case withdraw_vesting = 4
-//    case limit_order_create = 5
-//    case limit_order_cancel = 6
-//    case feed_publish = 7
-    case convert = 8
-    case account_create = 9
-    case account_update = 10
-    case witness_update = 11
-    case account_witness_vote = 12
-    case account_witness_proxy = 13
-    case pow = 14
-    case custom = 15
-    case report_over_production = 16
-    case delete_comment = 17
-    case custom_json = 18
-    case comment_options = 19
-    case set_withdraw_vesting_route = 20
-//    case limit_order_create2 = 21
-    case challenge_authority = 22
-    case prove_authority = 23
-    case request_account_recovery = 24
-    case recover_account = 25
-    case change_recovery_account = 26
-    case escrow_transfer = 27
-    case escrow_dispute = 28
-    case escrow_release = 29
-    case pow2 = 30
-    case escrow_approve = 31
-    case transfer_to_savings = 32
-    case transfer_from_savings = 33
-    case cancel_transfer_from_savings = 34
-    case custom_binary = 35
-    case decline_voting_rights = 36
-    case reset_account = 37
-    case set_reset_account = 38
-    case claim_reward_balance = 39
-    case delegate_vesting_shares = 40
-    case account_create_with_delegation = 41
-    case fill_convert_request
-    case author_reward
-    case curation_reward
-    case comment_reward
-    case liquidity_reward
-    case interest
-    case fill_vesting_withdraw
-    case fill_order
-    case shutdown_witness
-    case fill_transfer_from_savings
-    case hardfork
-    case comment_payout_update
-    case return_vesting_delegation
-    case comment_benefactor_reward
-    case producer_reward
-    case create_invite
-    case claim_invite_balance
-    case invite_registration
-    case versioned_chain_properties_update
-    case award
-    case receive_award //Virtual Operation
-    case benefactor_award //Virtual Operation
-    case set_paid_subscription
-    case paid_subscribe
-    case paid_subscription_action //Virtual Operation
-    case cancel_paid_subscription //Virtual Operation
-    case set_account_price
-    case set_subaccount_price
-    case buy_account
-    case account_sale //Virtual Operation
+    case account_update = 5
+    case witness_update = 6
+    case account_witness_vote = 7
+    case account_witness_proxy = 8
+    case delete_content = 9
+    case custom = 10
+    case set_withdraw_vesting_route = 11
+    case request_account_recovery = 12
+    case recover_account = 13
+    case change_recovery_account = 14
+    case escrow_transfer = 15
+    case escrow_dispute = 16
+    case escrow_release = 17
+    case escrow_approve = 18
+    case delegate_vesting_shares = 19
+    case account_create = 20
+    case account_metadata = 21
+    case proposal_create = 22
+    case proposal_update = 23
+    case proposal_delete = 24
+    case chain_properties_update = 25
+    case author_reward = 26
+    case curation_reward = 27
+    case content_reward = 28
+    case fill_vesting_withdraw = 29
+    case shutdown_witness = 30
+    case hardfork = 31
+    case content_payout_update = 32
+    case content_benefactor_reward = 33
+    case return_vesting_delegation = 34
+    case committee_worker_create_request = 35
+    case committee_worker_cancel_request = 36
+    case committee_vote_request = 37
+    case committee_cancel_request = 38
+    case committee_approve_request = 39
+    case committee_payout_request = 40
+    case committee_pay_request = 41
+    case witness_reward = 42
+    case create_invite = 43
+    case claim_invite_balance = 44
+    case invite_registration = 45
+    case versioned_chain_properties_update = 46
+    case award = 47
+    case receive_award = 48
+    case benefactor_award = 49
+    case set_paid_subscription = 50
+    case paid_subscribe = 51
+    case paid_subscription_action = 52
+    case cancel_paid_subscription = 53
+    case set_account_price = 54
+    case set_subaccount_price = 55
+    case buy_account = 56
+    case account_sale = 57
+    case use_invite_balance = 58
+    case expire_escrow_ratification = 59
     case unknown = 255
 
     init(from decoder: Decoder) throws {
@@ -1008,58 +1001,32 @@ fileprivate enum OperationId: UInt8, VIZEncodable, Decodable {
         let name = try container.decode(String.self)
         switch name {
         case "vote": self = .vote
-        case "comment": self = .comment
+        case "content": self = .content
         case "transfer": self = .transfer
         case "transfer_to_vesting": self = .transfer_to_vesting
         case "withdraw_vesting": self = .withdraw_vesting
-        case "convert": self = .convert
         case "account_create": self = .account_create
         case "account_update": self = .account_update
         case "witness_update": self = .witness_update
         case "account_witness_vote": self = .account_witness_vote
         case "account_witness_proxy": self = .account_witness_proxy
-        case "pow": self = .pow
         case "custom": self = .custom
-        case "report_over_production": self = .report_over_production
-        case "delete_comment": self = .delete_comment
-        case "custom_json": self = .custom_json
-        case "comment_options": self = .comment_options
         case "set_withdraw_vesting_route": self = .set_withdraw_vesting_route
-        case "challenge_authority": self = .challenge_authority
-        case "prove_authority": self = .prove_authority
         case "request_account_recovery": self = .request_account_recovery
         case "recover_account": self = .recover_account
         case "change_recovery_account": self = .change_recovery_account
         case "escrow_transfer": self = .escrow_transfer
         case "escrow_dispute": self = .escrow_dispute
         case "escrow_release": self = .escrow_release
-        case "pow2": self = .pow2
         case "escrow_approve": self = .escrow_approve
-        case "transfer_to_savings": self = .transfer_to_savings
-        case "transfer_from_savings": self = .transfer_from_savings
-        case "cancel_transfer_from_savings": self = .cancel_transfer_from_savings
-        case "custom_binary": self = .custom_binary
-        case "decline_voting_rights": self = .decline_voting_rights
-        case "reset_account": self = .reset_account
-        case "set_reset_account": self = .set_reset_account
-        case "claim_reward_balance": self = .claim_reward_balance
         case "delegate_vesting_shares": self = .delegate_vesting_shares
-        case "account_create_with_delegation": self = .account_create_with_delegation
-        case "fill_convert_request": self = .fill_convert_request
         case "author_reward": self = .author_reward
         case "curation_reward": self = .curation_reward
-        case "comment_reward": self = .comment_reward
-        case "liquidity_reward": self = .liquidity_reward
-        case "interest": self = .interest
         case "fill_vesting_withdraw": self = .fill_vesting_withdraw
-        case "fill_order": self = .fill_order
         case "shutdown_witness": self = .shutdown_witness
-        case "fill_transfer_from_savings": self = .fill_transfer_from_savings
         case "hardfork": self = .hardfork
-        case "comment_payout_update": self = .comment_payout_update
         case "return_vesting_delegation": self = .return_vesting_delegation
-        case "comment_benefactor_reward": self = .comment_benefactor_reward
-        case "producer_reward": self = .producer_reward
+        case "witness_reward": self = .witness_reward
         case "create_invite": self = .create_invite
         case "claim_invite_balance": self = .claim_invite_balance
         case "invite_registration": self = .invite_registration
@@ -1108,66 +1075,38 @@ internal struct AnyOperation: VIZEncodable, Decodable {
         let op: OperationType
         switch id {
         case .vote: op = try container.decode(Operation.Vote.self)
-        case .comment: op = try container.decode(Operation.Comment.self)
+        case .content: op = try container.decode(Operation.Content.self)
         case .transfer: op = try container.decode(Operation.Transfer.self)
         case .transfer_to_vesting: op = try container.decode(Operation.TransferToVesting.self)
         case .withdraw_vesting: op = try container.decode(Operation.WithdrawVesting.self)
-        case .convert: op = try container.decode(Operation.Convert.self)
         case .account_create: op = try container.decode(Operation.AccountCreate.self)
         case .account_update: op = try container.decode(Operation.AccountUpdate.self)
         case .witness_update: op = try container.decode(Operation.WitnessUpdate.self)
         case .account_witness_vote: op = try container.decode(Operation.AccountWitnessVote.self)
         case .account_witness_proxy: op = try container.decode(Operation.AccountWitnessProxy.self)
-        case .pow: op = try container.decode(Operation.Pow.self)
-        case .custom: op = try container.decode(Operation.Custom.self)
-        case .report_over_production: op = try container.decode(Operation.ReportOverProduction.self)
-        case .delete_comment: op = try container.decode(Operation.DeleteComment.self)
-        case .custom_json: op = try container.decode(Operation.CustomJson.self)
-        case .comment_options: op = try container.decode(Operation.CommentOptions.self)
-        case .set_withdraw_vesting_route: op = try container.decode(Operation.SetWithdrawVestingRoute.self)
-        case .challenge_authority: op = try container.decode(Operation.ChallengeAuthority.self)
-        case .prove_authority: op = try container.decode(Operation.ProveAuthority.self)
+        case .custom: op = try container.decode(Operation.CustomJson.self)
         case .request_account_recovery: op = try container.decode(Operation.RequestAccountRecovery.self)
         case .recover_account: op = try container.decode(Operation.RecoverAccount.self)
         case .change_recovery_account: op = try container.decode(Operation.ChangeRecoveryAccount.self)
         case .escrow_transfer: op = try container.decode(Operation.EscrowTransfer.self)
         case .escrow_dispute: op = try container.decode(Operation.EscrowDispute.self)
         case .escrow_release: op = try container.decode(Operation.EscrowRelease.self)
-        case .pow2: op = try container.decode(Operation.Pow2.self)
         case .escrow_approve: op = try container.decode(Operation.EscrowApprove.self)
-        case .transfer_to_savings: op = try container.decode(Operation.TransferToSavings.self)
-        case .transfer_from_savings: op = try container.decode(Operation.TransferFromSavings.self)
-        case .cancel_transfer_from_savings: op = try container.decode(Operation.CancelTransferFromSavings.self)
-        case .custom_binary: op = try container.decode(Operation.CustomBinary.self)
-        case .decline_voting_rights: op = try container.decode(Operation.DeclineVotingRights.self)
-        case .reset_account: op = try container.decode(Operation.ResetAccount.self)
-        case .set_reset_account: op = try container.decode(Operation.SetResetAccount.self)
-        case .claim_reward_balance: op = try container.decode(Operation.ClaimRewardBalance.self)
         case .delegate_vesting_shares: op = try container.decode(Operation.DelegateVestingShares.self)
-        case .account_create_with_delegation: op = try container.decode(Operation.AccountCreateWithDelegation.self)
-        case .fill_convert_request: op = try container.decode(Operation.FillConvertRequest.self)
         case .author_reward: op = try container.decode(Operation.AuthorReward.self)
         case .curation_reward: op = try container.decode(Operation.CurationReward.self)
-        case .comment_reward: op = try container.decode(Operation.CommentReward.self)
-        case .liquidity_reward: op = try container.decode(Operation.LiquidityReward.self)
-        case .interest: op = try container.decode(Operation.Interest.self)
         case .fill_vesting_withdraw: op = try container.decode(Operation.FillVestingWithdraw.self)
-        case .fill_order: op = try container.decode(Operation.FillOrder.self)
         case .shutdown_witness: op = try container.decode(Operation.ShutdownWitness.self)
-        case .fill_transfer_from_savings: op = try container.decode(Operation.FillTransferFromSavings.self)
         case .hardfork: op = try container.decode(Operation.Hardfork.self)
-        case .comment_payout_update: op = try container.decode(Operation.CommentPayoutUpdate.self)
         case .return_vesting_delegation: op = try container.decode(Operation.ReturnVestingDelegation.self)
-        case .comment_benefactor_reward: op = try container.decode(Operation.CommentBenefactorReward.self)
-        case .producer_reward: op = try container.decode(Operation.ProducerReward.self)
-            
+        case .witness_reward: op = try container.decode(Operation.ProducerReward.self)
         case .create_invite: op = Operation.Unknown()
         case .claim_invite_balance: op = Operation.Unknown()
         case .invite_registration: op = Operation.Unknown()
         case .versioned_chain_properties_update: op = Operation.Unknown()
         case .award: op = try container.decode(Operation.Award.self)
         case .receive_award: op = Operation.Unknown()
-        case .benefactor_award: op = Operation.Unknown()
+        case .benefactor_award: op = try container.decode(Operation.CommentBenefactorReward.self)
         case .set_paid_subscription: op = Operation.Unknown()
         case .paid_subscribe: op = Operation.Unknown()
         case .paid_subscription_action: op = Operation.Unknown()
@@ -1176,7 +1115,25 @@ internal struct AnyOperation: VIZEncodable, Decodable {
         case .set_subaccount_price: op = Operation.Unknown()
         case .buy_account: op = Operation.Unknown()
         case .account_sale: op = Operation.Unknown()
-            
+        case .delete_content: op = try container.decode(Operation.DeleteContent.self)
+        case .set_withdraw_vesting_route: op = try container.decode(Operation.SetWithdrawVestingRoute.self)
+        case .account_metadata: op = Operation.Unknown()
+        case .proposal_create: op = Operation.Unknown()
+        case .proposal_update: op = Operation.Unknown()
+        case .proposal_delete: op = Operation.Unknown()
+        case .chain_properties_update: op = Operation.Unknown()
+        case .content_reward: op = try container.decode(Operation.CommentReward.self)
+        case .content_payout_update: op = Operation.Unknown()
+        case .content_benefactor_reward: op = Operation.Unknown()
+        case .committee_worker_create_request: op = Operation.Unknown()
+        case .committee_worker_cancel_request: op = Operation.Unknown()
+        case .committee_vote_request: op = Operation.Unknown()
+        case .committee_cancel_request: op = Operation.Unknown()
+        case .committee_approve_request: op = Operation.Unknown()
+        case .committee_payout_request: op = Operation.Unknown()
+        case .committee_pay_request: op = Operation.Unknown()
+        case .use_invite_balance: op = Operation.Unknown()
+        case .expire_escrow_ratification: op = Operation.Unknown()
         case .unknown: op = Operation.Unknown()
         }
         self.operation = op
@@ -1188,8 +1145,8 @@ internal struct AnyOperation: VIZEncodable, Decodable {
         case let op as Operation.Vote:
             try container.encode(OperationId.vote)
             try container.encode(op)
-        case let op as Operation.Comment:
-            try container.encode(OperationId.comment)
+        case let op as Operation.Content:
+            try container.encode(OperationId.content)
             try container.encode(op)
         case let op as Operation.Transfer:
             try container.encode(OperationId.transfer)
@@ -1199,9 +1156,6 @@ internal struct AnyOperation: VIZEncodable, Decodable {
             try container.encode(op)
         case let op as Operation.WithdrawVesting:
             try container.encode(OperationId.withdraw_vesting)
-            try container.encode(op)
-        case let op as Operation.Convert:
-            try container.encode(OperationId.convert)
             try container.encode(op)
         case let op as Operation.AccountCreate:
             try container.encode(OperationId.account_create)
@@ -1218,32 +1172,14 @@ internal struct AnyOperation: VIZEncodable, Decodable {
         case let op as Operation.AccountWitnessProxy:
             try container.encode(OperationId.account_witness_proxy)
             try container.encode(op)
-        case let op as Operation.Pow:
-            try container.encode(OperationId.pow)
-            try container.encode(op)
         case let op as Operation.Custom:
             try container.encode(OperationId.custom)
             try container.encode(op)
-        case let op as Operation.ReportOverProduction:
-            try container.encode(OperationId.report_over_production)
-            try container.encode(op)
-        case let op as Operation.DeleteComment:
-            try container.encode(OperationId.delete_comment)
-            try container.encode(op)
-        case let op as Operation.CustomJson:
-            try container.encode(OperationId.custom_json)
-            try container.encode(op)
-        case let op as Operation.CommentOptions:
-            try container.encode(OperationId.comment_options)
+        case let op as Operation.DeleteContent:
+            try container.encode(OperationId.delete_content)
             try container.encode(op)
         case let op as Operation.SetWithdrawVestingRoute:
             try container.encode(OperationId.set_withdraw_vesting_route)
-            try container.encode(op)
-        case let op as Operation.ChallengeAuthority:
-            try container.encode(OperationId.challenge_authority)
-            try container.encode(op)
-        case let op as Operation.ProveAuthority:
-            try container.encode(OperationId.prove_authority)
             try container.encode(op)
         case let op as Operation.RequestAccountRecovery:
             try container.encode(OperationId.request_account_recovery)
@@ -1263,41 +1199,11 @@ internal struct AnyOperation: VIZEncodable, Decodable {
         case let op as Operation.EscrowRelease:
             try container.encode(OperationId.escrow_release)
             try container.encode(op)
-        case let op as Operation.Pow2:
-            try container.encode(OperationId.pow2)
-            try container.encode(op)
         case let op as Operation.EscrowApprove:
             try container.encode(OperationId.escrow_approve)
             try container.encode(op)
-        case let op as Operation.TransferToSavings:
-            try container.encode(OperationId.transfer_to_savings)
-            try container.encode(op)
-        case let op as Operation.TransferFromSavings:
-            try container.encode(OperationId.transfer_from_savings)
-            try container.encode(op)
-        case let op as Operation.CancelTransferFromSavings:
-            try container.encode(OperationId.cancel_transfer_from_savings)
-            try container.encode(op)
-        case let op as Operation.CustomBinary:
-            try container.encode(OperationId.custom_binary)
-            try container.encode(op)
-        case let op as Operation.DeclineVotingRights:
-            try container.encode(OperationId.decline_voting_rights)
-            try container.encode(op)
-        case let op as Operation.ResetAccount:
-            try container.encode(OperationId.reset_account)
-            try container.encode(op)
-        case let op as Operation.SetResetAccount:
-            try container.encode(OperationId.set_reset_account)
-            try container.encode(op)
-        case let op as Operation.ClaimRewardBalance:
-            try container.encode(OperationId.claim_reward_balance)
-            try container.encode(op)
         case let op as Operation.DelegateVestingShares:
             try container.encode(OperationId.delegate_vesting_shares)
-            try container.encode(op)
-        case let op as Operation.AccountCreateWithDelegation:
-            try container.encode(OperationId.account_create_with_delegation)
             try container.encode(op)
         case let op as Operation.Award:
             try container.encode(OperationId.award)

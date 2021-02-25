@@ -47,7 +47,7 @@ class ClientTest: XCTestCase {
     func testBroadcastAward() {
         let test = expectation(description: "Response")
         let key = PrivateKey("5K5exRbTT5d6HnAsNgdFptedttd8w9HnYXz3jfmPbK35GZQXqia")!
-        let award = Operation.Award(initiator: "babin", receiver: "babin", energy: 1, customSequence: 0, memo: "")
+        let award = Operation.Award(initiator: "babin", receiver: "babin", energy: 1, customSequence: 0, memo: "", beneficiaries: [])
         client.send(API.GetDynamicGlobalProperties()) { props, error in
             XCTAssertNil(error)
             guard let props = props else {
