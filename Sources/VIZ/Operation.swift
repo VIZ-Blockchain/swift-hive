@@ -801,6 +801,34 @@ public struct Operation {
             get { return self.jsonMetadata.object }
         }
     }
+    
+    public struct Award: OperationType, Equatable {
+        public let initiator: String
+        public let receiver: String
+        public let energy: UInt16
+        public let customSequence: UInt64
+        public let memo: String
+        public let beneficiaries: [Beneficiary]
+        
+        public init(initiator: String, receiver: String, energy: UInt16, customSequence: UInt64, memo: String, beneficiaries: [Operation.Beneficiary]) {
+            self.initiator = initiator
+            self.receiver = receiver
+            self.energy = energy
+            self.customSequence = customSequence
+            self.memo = memo
+            self.beneficiaries = beneficiaries
+        }
+    }
+    
+    public struct Beneficiary: OperationType, Equatable {
+        public let account: String
+        public let weight: UInt16
+        
+        public init(account: String, weight: UInt16) {
+            self.account = account
+            self.weight = weight
+        }
+    }
 
     // Virtual operations.
 
@@ -909,20 +937,6 @@ public struct Operation {
         public var isVirtual: Bool { return true }
         public let producer: String
         public let vestingShares: Asset
-    }
-    
-    public struct Award: OperationType, Equatable {
-        public let initiator: String
-        public let receiver: String
-        public let energy: UInt16
-        public let customSequence: UInt64
-        public let memo: String
-        public let beneficiaries: [Beneficiary]
-    }
-    
-    public struct Beneficiary: OperationType, Equatable {
-        public let account: String
-        public let weight: UInt16
     }
 
     /// Unknown operation, seen if the decoder encounters operation which has no type defined.
