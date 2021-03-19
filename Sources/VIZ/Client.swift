@@ -152,9 +152,16 @@ extension RequestPayload: Encodable {
 
 /// JSON-RPC 2.0 response error type.
 internal struct ResponseError: Decodable {
+    internal struct ResponseDataError: Decodable {
+        let code: Int
+        let name: String
+        let message: String
+        //let stack: [DataErrorStack]
+    }
+    
     let code: Int
     let message: String
-    let data: String
+    let data: [ResponseDataError]
 }
 
 /// JSON-RPC 2.0 response payload wrapper.
@@ -279,7 +286,7 @@ public class Client {
             throw Error.codingError(message: "Unable to decode error response", error: error)
         }
         if let error = responseErrorPayload.error {
-            throw Error.responseError(code: error.code, message: error.message, data: error.data)
+            throw Error.responseError(code: error.code, message: error.message, data: error.data.description)
         }
         
         let responsePayload: ResponsePayload<T>
