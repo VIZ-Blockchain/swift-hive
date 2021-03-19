@@ -218,7 +218,7 @@ public class Client {
         /// Unable to send request or invalid response from server.
         case networkError(message: String, error: Swift.Error?)
         /// Server responded with a JSON-RPC 2.0 error.
-        case responseError(code: Int, message: String, data: String)
+        case responseError(code: Int, message: String)
         /// Unable to decode the result or encode the request params.
         case codingError(message: String, error: Swift.Error)
 
@@ -232,7 +232,7 @@ public class Client {
                 return rv
             case let .codingError(message, error):
                 return "Unable to serialize data: \(message) (caused by \(String(describing: error))"
-            case let .responseError(code, message, _):
+            case let .responseError(code, message):
                 return "RPCError: \(message) (code=\(code))"
             }
         }
@@ -286,7 +286,7 @@ public class Client {
             throw Error.codingError(message: "Unable to decode error response", error: error)
         }
         if let error = responseErrorPayload.error {
-            throw Error.responseError(code: error.code, message: error.message, data: error.data.description)
+            throw Error.responseError(code: error.code, message: error.message)
         }
         
         let responsePayload: ResponsePayload<T>

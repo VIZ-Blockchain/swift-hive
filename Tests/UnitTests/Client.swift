@@ -141,7 +141,7 @@ class ClientTest: XCTestCase {
 //            XCTAssertNotNil(error)
 //            XCTAssertNil(response)
 //            XCTAssertEqual(error?.localizedDescription, "RPCError: Had some issues (code=123)")
-//            if let error = error as? Client.Error, case let Client.Error.responseError(code, message, data) = error {
+//            if let error = error as? Client.Error, case let Client.Error.responseError(code, message) = error {
 //                XCTAssertEqual(code, 123)
 //                XCTAssertEqual(message, "Had some issues")
 //                XCTAssertEqual(data as? [String: Int], ["extra": 123])
