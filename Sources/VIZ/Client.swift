@@ -161,7 +161,7 @@ internal struct ResponseError: Decodable {
     
     let code: Int
     let message: String
-    let data: [ResponseDataError]
+    let data: ResponseDataError
 }
 
 /// JSON-RPC 2.0 response payload wrapper.
