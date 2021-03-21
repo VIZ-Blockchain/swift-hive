@@ -829,6 +829,20 @@ public struct Operation {
             self.weight = weight
         }
     }
+    
+    public struct InviteRegistration: OperationType, Equatable {
+        public let initiator: String
+        public let newAccountName: String
+        public let inviteSecret: String
+        public let newAccountKey: PublicKey
+        
+        public init(initiator: String, newAccountName: String, inviteSecret: String, newAccountKey: PublicKey) {
+            self.initiator = initiator
+            self.newAccountName = newAccountName
+            self.inviteSecret = inviteSecret
+            self.newAccountKey = newAccountKey
+        }
+    }
 
     // Virtual operations.
 
@@ -1116,7 +1130,7 @@ internal struct AnyOperation: VIZEncodable, Decodable {
         case .witness_reward: op = try container.decode(Operation.ProducerReward.self)
         case .create_invite: op = Operation.Unknown()
         case .claim_invite_balance: op = Operation.Unknown()
-        case .invite_registration: op = Operation.Unknown()
+        case .invite_registration: op = try container.decode(Operation.InviteRegistration.self)
         case .versioned_chain_properties_update: op = Operation.Unknown()
         case .award: op = try container.decode(Operation.Award.self)
         case .receive_award: op = Operation.Unknown()
@@ -1221,6 +1235,9 @@ internal struct AnyOperation: VIZEncodable, Decodable {
             try container.encode(op)
         case let op as Operation.Award:
             try container.encode(OperationId.award)
+            try container.encode(op)
+        case let op as Operation.InviteRegistration:
+            try container.encode(OperationId.invite_registration)
             try container.encode(op)
         default:
             throw EncodingError.invalidValue(self.operation, EncodingError.Context(

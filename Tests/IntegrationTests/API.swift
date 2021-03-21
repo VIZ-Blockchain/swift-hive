@@ -82,7 +82,50 @@ class ClientTest: XCTestCase {
             }
         }
     }
-//
+
+//    func testInviteRegistration() {
+//        let test = expectation(description: "Response")
+//        let inviteAccountActive = PrivateKey("5KcfoRuDfkhrLCxVcE9x51J6KN9aM9fpb78tLrvvFckxVV6FyFW")!
+//        let inviteRegistration = VIZ.Operation.InviteRegistration(
+//            initiator: "invite",
+//            newAccountName: "tester",
+//            inviteSecret: "5KVvGJo9HGXoYBFiLbNqckJR8YxrRKApFjmL3PYWQeUNuaRZhXe",
+//            newAccountKey: inviteAccountActive.createPublic()
+//        )
+//        client.send(API.GetDynamicGlobalProperties()) { props, error in
+//            XCTAssertNil(error)
+//            guard let props = props else {
+//                return XCTFail("Unable to get props")
+//            }
+//            let expiry = props.time.addingTimeInterval(60)
+//            let tx = Transaction(
+//                refBlockNum: UInt16(props.headBlockNumber & 0xFFFF),
+//                refBlockPrefix: props.headBlockId.prefix,
+//                expiration: expiry,
+//                operations: [inviteRegistration]
+//            )
+//            guard let stx = try? tx.sign(usingKey: inviteAccountActive) else {
+//                return XCTFail("Unable to sign tx")
+//            }
+//            let trx = API.BroadcastTransaction(transaction: stx)
+//            client.send(trx) { res, error in
+//                XCTAssertNil(error)
+//                if let res = res {
+//                    XCTAssertFalse(res.expired)
+//                    XCTAssert(res.blockNum > props.headBlockId.num)
+//                } else {
+//                    XCTFail("No response")
+//                }
+//                test.fulfill()
+//            }
+//        }
+//        waitForExpectations(timeout: 10) { error in
+//            if let error = error {
+//                print("Error: \(error.localizedDescription)")
+//            }
+//        }
+//    }
+
 //    func testTransferBroadcast() {
 //        let test = expectation(description: "Response")
 //        let key = PrivateKey("5KS8eoAGLrCg2w3ytqSQXsmHuDTdvb2NLjJLpxgaiVJDXaGpcGT")!
