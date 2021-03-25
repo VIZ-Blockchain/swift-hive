@@ -49,4 +49,14 @@ class PrivateKeyTest: XCTestCase {
             XCTFail("Unable to decode WIF")
         }
     }
+    
+    func testGeneratePrivateFromSeed() {
+        let seed = "my seed phrase"
+        if let key = PrivateKey(seed: seed) {
+            XCTAssertEqual(String(key), "5K5mAQm8r7xautErt1uA2CtG4WrYM7zP5LLidLkq6dhxB7LFtV2")
+            XCTAssertEqual(String(key.createPublic()), "VIZ5m4otA8yWj9tck5sLuTYnxCCiUeUMEMdhhJDMn2vC1QPLv38bv")
+        } else {
+            XCTFail("Unable to generate private key from seed")
+        }
+    }
 }
