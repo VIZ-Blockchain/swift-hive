@@ -20,6 +20,12 @@ public struct Authority: VIZCodable, Equatable {
     public var accountAuths: [Auth<String>]
     /// Key auths.
     public var keyAuths: [Auth<PublicKey>]
+    
+    public init(weightThreshold: UInt32 = 1, accountAuths: [Auth<String>] = [], keyAuths: [Auth<PublicKey>]) {
+        self.weightThreshold = weightThreshold
+        self.accountAuths = accountAuths
+        self.keyAuths = keyAuths
+    }
 }
 
 extension Authority.Auth {
