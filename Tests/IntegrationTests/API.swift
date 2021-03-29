@@ -82,6 +82,62 @@ class ClientTest: XCTestCase {
             }
         }
     }
+    
+    func testAccountUpdate() {
+        let test = expectation(description: "Response")
+        let key = PrivateKey("5HvwFjGA5QWNXiB8nSCKW2dDjVPBJcrkcpprsViS1YBBcozpmbk")!
+        let accountName = "microb"
+        let password = "some random generated string"
+        
+        let masterKey = PrivateKey(seed: accountName + "master" + password)!
+        let masterPublicKey = masterKey.createPublic()
+        let masterAuthority = Authority(keyAuths: [Authority.Auth(masterPublicKey)])
+        
+        let activeKey = PrivateKey(seed: accountName + "active" + password)
+        let activePublicKey = activeKey!.createPublic()
+        let activeAuthority = Authority(keyAuths: [Authority.Auth(activePublicKey)])
+        
+        let regularKey = PrivateKey(seed: accountName + "regular" + password)
+        let regularPublicKey = regularKey!.createPublic()
+        let regularAuthority = Authority(keyAuths: [Authority.Auth(regularPublicKey)])
+        
+        let memoPublicKey = PrivateKey(seed: accountName + "memo" + password)!.createPublic()
+        
+        let accountUpdate = VIZ.Operation.AccountUpdate(account: accountName, masterAuthority: nil, activeAuthority: nil, regularAuthority: nil, memoKey: memoPublicKey)
+        client.send(API.GetDynamicGlobalProperties()) { props, error in
+            XCTAssertNil(error)
+            guard let props = props else {
+                return XCTFail("Unable to get props")
+            }
+            let expiry = props.time.addingTimeInterval(60)
+            let tx = Transaction(
+                refBlockNum: UInt16(props.headBlockNumber & 0xFFFF),
+                refBlockPrefix: props.headBlockId.prefix,
+                expiration: expiry,
+                operations: [accountUpdate]
+            )
+
+            guard let stx = try? tx.sign(usingKey: key) else {
+                return XCTFail("Unable to sign tx")
+            }
+            let trx = API.BroadcastTransaction(transaction: stx)
+            client.send(trx) { res, error in
+                XCTAssertNil(error)
+                if let res = res {
+                    XCTAssertFalse(res.expired)
+                    XCTAssert(res.blockNum > props.headBlockId.num)
+                } else {
+                    XCTFail("No response")
+                }
+                test.fulfill()
+            }
+        }
+        waitForExpectations(timeout: 10) { error in
+            if let error = error {
+                print("Error: \(error.localizedDescription)")
+            }
+        }
+    }
 
 //    func testInviteRegistration() {
 //        let test = expectation(description: "Response")
