@@ -183,24 +183,26 @@ public struct Operation {
     /// Updates an account.
     public struct AccountUpdate: OperationType, Equatable {
         public var account: String
-        public var masterAuthority: Authority?
-        public var activeAuthority: Authority?
-        public var regularAuthority: Authority?
+        public var master: Authority?
+        public var masterIsSet: Bool
+        public var active: Authority?
+        public var regular: Authority?
         public var memoKey: PublicKey
         public var jsonMetadata: String
 
         public init(
             account: String,
-            masterAuthority: Authority?,
-            activeAuthority: Authority?,
-            regularAuthority: Authority?,
+            master: Authority?,
+            active: Authority?,
+            regular: Authority?,
             memoKey: PublicKey,
             jsonMetadata: String = ""
         ) {
             self.account = account
-            self.masterAuthority = masterAuthority
-            self.activeAuthority = activeAuthority
-            self.regularAuthority = regularAuthority
+            self.master = master
+            self.masterIsSet = master != nil
+            self.active = active
+            self.regular = regular
             self.memoKey = memoKey
             self.jsonMetadata = jsonMetadata
         }
