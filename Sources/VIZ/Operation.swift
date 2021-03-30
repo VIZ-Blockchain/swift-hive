@@ -186,7 +186,9 @@ public struct Operation {
         public var master: Authority?
         public var masterIsSet: Bool
         public var active: Authority?
+        public var activeIsSet: Bool
         public var regular: Authority?
+        public var regularIsSet: Bool
         public var memoKey: PublicKey
         public var jsonMetadata: String
 
@@ -202,7 +204,9 @@ public struct Operation {
             self.master = master
             self.masterIsSet = master != nil
             self.active = active
+            self.activeIsSet = active != nil
             self.regular = regular
+            self.regularIsSet = regular != nil
             self.memoKey = memoKey
             self.jsonMetadata = jsonMetadata
         }
