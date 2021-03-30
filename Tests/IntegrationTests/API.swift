@@ -85,7 +85,6 @@ class ClientTest: XCTestCase {
     
     func testAccountUpdate() {
         let test = expectation(description: "Response")
-        let key = PrivateKey("5HvwFjGA5QWNXiB8nSCKW2dDjVPBJcrkcpprsViS1YBBcozpmbk")!
         let accountName = "microb"
         let password = "some random generated string"
         
@@ -103,7 +102,7 @@ class ClientTest: XCTestCase {
         
         let memoPublicKey = PrivateKey(seed: accountName + "memo" + password)!.createPublic()
         
-        let accountUpdate = VIZ.Operation.AccountUpdate(account: accountName, masterAuthority: nil, activeAuthority: nil, regularAuthority: nil, memoKey: memoPublicKey)
+        let accountUpdate = VIZ.Operation.AccountUpdate(account: accountName, master: masterAuthority, active: activeAuthority, regular: regularAuthority, memoKey: memoPublicKey)
         client.send(API.GetDynamicGlobalProperties()) { props, error in
             XCTAssertNil(error)
             guard let props = props else {
@@ -117,7 +116,7 @@ class ClientTest: XCTestCase {
                 operations: [accountUpdate]
             )
 
-            guard let stx = try? tx.sign(usingKey: key) else {
+            guard let stx = try? tx.sign(usingKey: masterKey) else {
                 return XCTFail("Unable to sign tx")
             }
             let trx = API.BroadcastTransaction(transaction: stx)

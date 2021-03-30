@@ -183,12 +183,12 @@ public struct Operation {
     /// Updates an account.
     public struct AccountUpdate: OperationType, Equatable {
         public var account: String
-        public var master: Authority?
         public var masterIsSet: Bool
-        public var active: Authority?
+        public var master: Authority?
         public var activeIsSet: Bool
-        public var regular: Authority?
+        public var active: Authority?
         public var regularIsSet: Bool
+        public var regular: Authority?
         public var memoKey: PublicKey
         public var jsonMetadata: String
 
