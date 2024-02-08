@@ -9,8 +9,14 @@ let package = Package(
         .library(name: "VIZ", targets: ["VIZ"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/Flight-School/AnyCodable.git", .revision("396ccc3dba5bdee04c1e742e7fab40582861401e")),
-        .package(url: "https://github.com/lukaskubanek/OrderedDictionary.git", .branch("master")),
+        .package(
+            url: "https://github.com/Flight-School/AnyCodable.git", 
+            from: "0.6.0"
+        ),
+        .package(
+            url: "https://github.com/lukaskubanek/OrderedDictionary.git", 
+            from: "4.0.0"
+        ),
     ],
     targets: [
         .target(

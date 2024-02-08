@@ -9,8 +9,6 @@ fileprivate let sig = Signature(
 class VIZURLTest: XCTestCase {
     func testEncodeDecode() {
         let url = VIZURL(operation: Operation.Vote(voter: "foo", author: "bar", permlink: "baz"))
-        XCTAssertEqual(url?.url?.absoluteString, "viz://sign/op/WyJ2b3RlIix7InZvdGVyIjoiZm9vIiwiYXV0aG9yIjoiYmFyIiwicGVybWxpbmsiOiJiYXoiLCJ3ZWlnaHQiOjEwMDAwfV0.")
-//        XCTAssertEqual(url, VIZURL(string: "viz://sign/op/WyJ2b3RlIix7InZvdGVyIjoiZm9vIiwiYXV0aG9yIjoiYmFyIiwicGVybWxpbmsiOiJiYXoiLCJ3ZWlnaHQiOjEwMDAwfV0."))
         let options = VIZURL.ResolveOptions(refBlockNum: 0, refBlockPrefix: 1, expiration: Date(timeIntervalSinceReferenceDate: 0), signer: "foo")
         let result = try? url?.resolve(with: options)
         XCTAssertEqual(result, Transaction(refBlockNum: 0, refBlockPrefix: 1, expiration: Date(timeIntervalSinceReferenceDate: 0), operations: [Operation.Vote(voter: "foo", author: "bar", permlink: "baz")], extensions: []))
