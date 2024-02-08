@@ -1,6 +1,8 @@
 # viz-swift-lib
 
-VIZ library for Swift.
+![Tests badge](https://github.com/VIZ-Blockchain/viz-swift-lib/actions/workflows/tests.yml/badge.svg?branch=master)
+
+VIZ library for Swift language
 
 Installation
 ------------
