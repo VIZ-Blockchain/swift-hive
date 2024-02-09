@@ -33,7 +33,7 @@ public struct Signature: Equatable, LosslessStringConvertible {
     /// - Parameter prefix: The address prefix to use for the resulting public key, optional.
     /// - Returns: The public key used to create the signature or nil if the recovery was unsucessful.
     public func recover(message: Data, prefix: PublicKey.AddressPrefix = .mainNet) -> PublicKey? {
-        guard let key = try? Secp256k1Context.shared.recover(message: message, signature: self.signature, recoveryId: Int32(self.recoveryId)) else {
+        guard let key = try? Secp256k1.shared.recover(message: message, signature: self.signature, recoveryId: Int32(self.recoveryId)) else {
             return nil
         }
         return PublicKey(key: key, prefix: prefix)!

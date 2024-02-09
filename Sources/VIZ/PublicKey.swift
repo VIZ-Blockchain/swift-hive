@@ -54,8 +54,8 @@ public struct PublicKey: Equatable {
 }
 
 extension PublicKey: Hashable {
-    public var hashValue: Int {
-        return self.key.withUnsafeBytes { $0.pointee } + self.prefix.hashValue
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(key.withUnsafeBytes { $0.load(as: Int.self) } + self.prefix.hashValue)
     }
 }
 

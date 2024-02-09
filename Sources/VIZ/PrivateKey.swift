@@ -17,7 +17,7 @@ public struct PrivateKey: Equatable {
             return nil
         }
         let secret = data.suffix(from: 1)
-        guard Secp256k1Context.shared.verify(secretKey: secret) else {
+        guard Secp256k1.shared.verify(secretKey: secret) else {
             return nil
         }
         self.secret = secret
@@ -52,7 +52,7 @@ public struct PrivateKey: Equatable {
             } else {
                 ndata = Random.bytes(count: 32)
             }
-            result = try Secp256k1Context.shared.sign(message: message, secretKey: self.secret, ndata: ndata)
+            result = try Secp256k1.shared.sign(message: message, secretKey: self.secret, ndata: ndata)
         } while (!isCanonicalSignature(result.0))
         return Signature(signature: result.0, recoveryId: UInt8(result.1))
     }
@@ -60,7 +60,7 @@ public struct PrivateKey: Equatable {
     /// Derive the public key for this private key.
     /// - Parameter prefix: Address prefix to use when creating key, defaults to main net (STM).
     public func createPublic(prefix: PublicKey.AddressPrefix = .mainNet) -> PublicKey {
-        let result = try! Secp256k1Context.shared.createPublic(fromSecret: self.secret)
+        let result = try! Secp256k1.shared.createPublic(fromSecret: self.secret)
         return PublicKey(key: result, prefix: prefix)!
     }
 
