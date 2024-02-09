@@ -1,6 +1,7 @@
 /**
  * Copyright (c) 2013-2014 Tomas Dzetkulic
  * Copyright (c) 2013-2014 Pavol Rusnak
+ * Copyright (c) 2019 Johan Nordberg
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the "Software"),
@@ -24,23 +25,11 @@
 #ifndef __BASE58_H__
 #define __BASE58_H__
 
+#include <stddef.h>
 #include <stdint.h>
-#include <stdbool.h>
-#include "hasher.h"
-#include "options.h"
 
-int base58_encode_check(const uint8_t *data, int len, HasherType hasher_type, char *str, int strsize);
-int base58_decode_check(const char *str, HasherType hasher_type, uint8_t *data, int datalen);
-
-// Private
-bool b58tobin(void *bin, size_t *binszp, const char *b58);
-int b58check(const void *bin, size_t binsz, HasherType hasher_type, const char *base58str);
-bool b58enc(char *b58, size_t *b58sz, const void *data, size_t binsz);
-
-#if USE_GRAPHENE
-int base58gph_encode_check(const uint8_t *data, int datalen, char *str, int strsize);
-int base58gph_decode_check(const char *str, uint8_t *data, int datalen);
-int b58gphcheck(const void *bin, size_t binsz, const char *base58str);
-#endif
+size_t base58_encode(const uint8_t *data, size_t datalen, char *str,
+                     size_t strsize);
+size_t base58_decode(const char *str, uint8_t *data, size_t datalen);
 
 #endif

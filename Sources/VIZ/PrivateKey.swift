@@ -38,7 +38,7 @@ public struct PrivateKey: Equatable {
         guard let data = seed.data(using: .utf8) else {
             return nil
         }
-        self.secret = data.sha256Digest()
+        self.secret = data.sha256Digest
     }
 
     /// Sign a message.
@@ -50,7 +50,7 @@ public struct PrivateKey: Equatable {
             if PrivateKey.determenisticSignatures {
                 ndata[0] += 1
             } else {
-                ndata = Random.bytes(count: 32)
+                ndata = Data.random(32)
             }
             result = try Secp256k1.shared.sign(message: message, secretKey: self.secret, ndata: ndata)
         } while (!isCanonicalSignature(result.0))

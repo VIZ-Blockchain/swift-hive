@@ -40,7 +40,7 @@ public struct PublicKey: Equatable {
         guard key.count > 0 else {
             return nil
         }
-        guard let keyData = Data(base58CheckEncoded: String(key), options: .grapheneChecksum) else {
+        guard let keyData = Data(base58CheckEncoded: String(key), .ripemd160) else {
             return nil
         }
         self.prefix = AddressPrefix(String(prefix))
@@ -49,7 +49,7 @@ public struct PublicKey: Equatable {
 
     /// Public key address string.
     public var address: String {
-        return String(self.prefix) + self.key.base58CheckEncodedString(options: .grapheneChecksum)!
+        return String(self.prefix) + self.key.base58CheckEncodedString(.ripemd160)!
     }
 }
 
