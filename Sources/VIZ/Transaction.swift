@@ -55,8 +55,7 @@ public struct Transaction: _Transaction {
     public func digest(forChain chain: ChainId = .mainNet) throws -> Data {
         var data = chain.data
         data.append(try VIZEncoder.encode(self))
-//        print(data.hexEncodedString())
-        return data.sha256Digest()
+        return data.sha256Digest
     }
 }
 

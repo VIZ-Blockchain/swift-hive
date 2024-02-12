@@ -17,6 +17,7 @@ let package = Package(
             url: "https://github.com/lukaskubanek/OrderedDictionary.git", 
             from: "4.0.0"
         ),
+        .package(name: "secp256k1gm", url: "https://github.com/greymass/secp256k1.git", .branch("master")),
     ],
     targets: [
         .target(
@@ -24,12 +25,8 @@ let package = Package(
             dependencies: []
         ),
         .target(
-            name: "secp256k1",
-            dependencies: []
-        ),
-        .target(
             name: "VIZ",
-            dependencies: ["Crypto", "AnyCodable", "OrderedDictionary", "secp256k1"]
+            dependencies: ["Crypto", "AnyCodable", "OrderedDictionary", "secp256k1gm"]
         ),
         .testTarget(
             name: "UnitTests",

@@ -9,12 +9,12 @@ public struct BlockId: Codable, Equatable {
     public var hash: Data
     /// The block number.
     public var num: UInt32 {
-        return UInt32(bigEndian: self.hash.withUnsafeBytes { $0.pointee })
+        return UInt32(bigEndian: self.hash.withUnsafeBytes { $0.load(as: UInt32.self) })
     }
 
     /// The block prefix.
     public var prefix: UInt32 {
-        return UInt32(littleEndian: self.hash.suffix(from: 4).withUnsafeBytes { $0.pointee })
+        return UInt32(littleEndian: self.hash.suffix(from: 4).withUnsafeBytes { $0.load(as: UInt32.self) })
     }
 
     public init(from decoder: Decoder) throws {
